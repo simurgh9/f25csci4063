@@ -8,6 +8,6 @@ until [ "$(curl -s http://ollama:11434/)" = "Ollama is running" ]; do
 done
 
 echo "Ollama is up! Pulling model..."
-ollama pull llama3
+ollama pull qwen3:0.6b
 
 echo "✅ Model bootstrap complete"
