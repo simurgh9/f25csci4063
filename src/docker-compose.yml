@@ -1,7 +1,7 @@
 services:
   ollama:
     image: ollama/ollama:latest
-    container_name: ollama
+    container_name: ollama_server
     ports:
       - "11434:11434"
     volumes:
