@@ -14,7 +14,8 @@
 
 ## Meeting 2
 
-<!-- - Write bullet notes here. -->
+- Ollama container
+- Transcript data website: https://transcripts.foreverdreaming.org/viewforum.php?f=1662
 
 ## Meeting 3
 
