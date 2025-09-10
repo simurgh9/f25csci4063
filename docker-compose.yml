@@ -1,0 +1,24 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  model-bootstrap:
+    image: ollama/ollama:latest
+    depends_on:
+      - ollama
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./bootstrap.sh:/bootstrap.sh
+    entrypoint: ["/bin/sh", "-c", "apt-get update && apt-get install -y curl && /bootstrap.sh"]
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+
+
+
+volumes:
+  ollama_data:
