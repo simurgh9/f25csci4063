@@ -1,14 +1,14 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 
 const ollamaRouter = Router();
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
 
-ollamaRouter.post("/generate", async (req, res) => {
+ollamaRouter.post("/generate", async (req: Request, res: Response) => {
 	try {
 		const { prompt } = req.body;
-		console.log(`${OLLAMA_BASE_URL}/api/generate`);
 		console.log(`Awaiting response to prompt: ${prompt}...`);
+
 		const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -18,8 +18,12 @@ ollamaRouter.post("/generate", async (req, res) => {
 		const data = await response.json();
 		console.log("Response received");
 		res.json(data);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			res.status(500).json({ error: error.message });
+		} else {
+			res.status(500).json({ error: "an unknown error occurred" });
+		}
 	}
 });
 

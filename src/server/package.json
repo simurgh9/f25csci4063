@@ -1,16 +1,25 @@
 {
 	"name": "server",
 	"version": "1.0.0",
-	"main": "server.js",
+	"main": "dist/index.js",
 	"scripts": {
-		"start": "node server.js"
+		"dev": "ts-node src/index.ts",
+		"build": "tsc",
+		"start": "node dist/index.js"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"description": "",
-	"type": "module",
 	"dependencies": {
+		"axios": "^1.12.2",
+		"cheerio": "^1.1.2",
 		"express": "^5.1.0"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.3",
+		"@types/node": "^24.5.0",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.9.2"
 	}
 }

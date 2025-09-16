@@ -1,9 +1,9 @@
 import express from "express";
 
-import ollamaRouter from "./routes/ollama.js";
+import ollamaRouter from "./routes/ollama";
 
-const PORT = 3000;
 const app = express();
+const PORT = 3000;
 
 // middleware functions
 app.use(express.json());
