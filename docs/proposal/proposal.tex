@@ -13,7 +13,11 @@
 
 \begin{document} \maketitle
 
-\textbf{Overview:} A cross-platform mobile app that recommends posts to users based on their progress in a series to avoid spoilers and promote a safe fandom experience. We will implement a lightweight llm to discern spoilers within a text and act within a certain degree of confidence. For low confidence, we may escalate to a reasoning model.
+\textbf{Description:} 
+
+A cross-platform mobile app that recommends posts to users based on their progress in a tv series to avoid spoilers and promote a safe fandom experience. It will have a simple UI similar to Tumblr, where users can read and write text-based posts about fandoms they enjoy. We will implement Retrieval-Augmented Generation to discern and flag spoilers to improve the user experience. 
+
+Should we have time left over, we will expand this to include the ability to post images as well as text, and include fandoms beyond tv shows.
 
 \bigskip
 
@@ -21,7 +25,17 @@
 \begin{itemize}
   \item Express with TypeScript
   \item Flutter with Dart
-  \item Ollama
+\end{itemize}
+
+\bigskip
+
+\textbf{Features:}
+\begin{itemize}
+  \item User accounts and authentication
+  \item Text-based UI similar to Tumblr
+  \item Ability to input your current episode for a given tv show
+  \item Recommendation of posts based on current episode in a series
+  \item Post interactions like liking and commenting
 \end{itemize}
 
 % \newpage
