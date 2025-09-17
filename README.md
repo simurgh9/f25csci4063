@@ -16,10 +16,14 @@
 
 - Ollama container
 - Transcript data website: https://transcripts.foreverdreaming.org/viewforum.php?f=1662
+- Meeting Notes: Organize project using MVC format, start drafting Project Proposal
 
 ## Meeting 3
 
-<!-- - Write bullet notes here. -->
+- Basic Forever Dreaming Transcripts scraper
+- MVC implementation
+- Proposal progress
+- Meeting Notes: Contact Dreaming Transcripts about use of their data, bring scraped data to show next time, continue working on proposal
 
 ## Meeting 4
 
