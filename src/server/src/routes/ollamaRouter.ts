@@ -1,6 +1,6 @@
 import { Router} from "express";
 
-import { OllamaController } from "../controllers/modelController/ollamaController";
+import { OllamaController } from "../controllers/model/ollamaController";
 const ollamaController = new OllamaController()
 
 const ollamaRouter = Router();
