@@ -23,6 +23,7 @@
 - Basic Forever Dreaming Transcripts scraper
 - MVC implementation
 - Proposal progress
+- Meeting Notes: Contact Dreaming Transcripts about use of their data, bring scraped data to show next time, continue working on proposal
 
 ## Meeting 4
 
