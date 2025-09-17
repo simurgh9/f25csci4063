@@ -10,4 +10,4 @@ done
 echo "Ollama is up! Pulling model..."
 ollama pull qwen3:0.6b
 
-echo "✅ Model bootstrap complete"
+echo "Model bootstrap complete"
