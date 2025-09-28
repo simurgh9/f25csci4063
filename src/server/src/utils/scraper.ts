@@ -12,7 +12,6 @@ export async function scrapeOverview(pageExtension: number) {
 		
 		const episodesH2 = selector("h2").filter((_, el) => selector(el).text().trim() === "Topics");
 
-		
 		const episodes = episodesH2
 			.nextAll(".topics")
 			.find(".topictitle")
