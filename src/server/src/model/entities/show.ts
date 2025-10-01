@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity } from "typeorm"
+import { Episode } from "./episode"
 
 @Entity()
 export class Show extends BaseEntity {
@@ -7,4 +8,7 @@ export class Show extends BaseEntity {
 
     @Column()
     title!: string
+
+    @OneToMany(() => Episode, (episode) => episode.show, { cascade: true })
+    episodes!: Episode[] 
 }
