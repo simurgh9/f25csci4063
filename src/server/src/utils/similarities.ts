@@ -1,7 +1,3 @@
-const scraper = require("./scraper");
-const embedder = require("./embedding"); 
-const chunker = require("./Chunker");
-
 export interface EmbeddingVector {
     embedding: number[];
     chunk_text: string;
@@ -36,28 +32,28 @@ export function findSimilarity(embeddings: EmbeddingVector[], promptEmbedding: n
     return similarities.slice(0, 5);
 }
 
-if (require.main === module) {
-  (async () => {
-    const [, , type, id] = process.argv;
-    if (type === "transcript") {
-        const { transcript } = await scraper.scrapeTranscript(id);
+// if (require.main === module) {
+//   (async () => {
+//     const [, , type, id] = process.argv;
+//     if (type === "transcript") {
+//         const { transcript } = await scraper.scrapeTranscript(id);
 
-        const chunks = chunker.chunkText(transcript, 2000);
+//         const chunks = chunker.chunkText(transcript, 2000);
 
-        const embeddingResponse = await embedder.generateEmbeddings(chunks);
+//         const embeddingResponse = await embedder.generateEmbeddings(chunks);
 
-        const records: EmbeddingVector[] = embeddingResponse.data.map((item: any, index: number) => ({
-        embedding: item.embedding,
-        chunk_text: chunks[index],
-        }));
+//         const records: EmbeddingVector[] = embeddingResponse.data.map((item: any, index: number) => ({
+//         embedding: item.embedding,
+//         chunk_text: chunks[index],
+//         }));
 
-        const promptResponse = await embedder.generateEmbeddings(["The way Gus went out was intense!"]);
-        const promptEmbedding = promptResponse.data[0].embedding;
+//         const promptResponse = await embedder.generateEmbeddings(["The way Gus went out was intense!"]);
+//         const promptEmbedding = promptResponse.data[0].embedding;
 
-        const similarities = findSimilarity(records, promptEmbedding);
-        console.log(similarities)
-    } else {
-        console.log("Usage: npx ts-node embedding.ts transcript <topicId>");
-    }
-  })();
-}
+//         const similarities = findSimilarity(records, promptEmbedding);
+//         console.log(similarities)
+//     } else {
+//         console.log("Usage: npx ts-node embedding.ts transcript <topicId>");
+//     }
+//   })();
+// }
