@@ -23,15 +23,29 @@
 - Basic Forever Dreaming Transcripts scraper
 - MVC implementation
 - Proposal progress
-- Meeting Notes: Contact Dreaming Transcripts about use of their data, bring scraped data to show next time, continue working on proposal
+- Meeting Notes: Contact Dreaming Transcripts about use of their data,
+  bring scraped data to show next time, continue working on proposal
 
 ## Meeting 4
 
-<!-- - Write bullet notes here. -->
+- Write me.
 
 ## Meeting 5
 
-<!-- - Write bullet notes here. -->
+- Clean unused files (the ones from when tashfeen created the repo.)
+- Describe where your database lives and give a simple SQL (if using
+  SQL) query to query it. For example,
+  ```SQL
+  SELECT name, email
+  FROM customers
+  WHERE city = 'New York';
+  ```
+
+### Pre-Project
+
+- Define: Retrieveal-Augmented Generation.
+- Ask Haley (Because Tashfeen spoke to them during the meeting on October
+  1, 2025).
 
 ## Proposal
 
