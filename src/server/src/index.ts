@@ -1,7 +1,9 @@
 import express from "express";
+import "reflect-metadata";
 require('dotenv').config({
     path: './.env'
 })
+
 
 import ollamaRouter from "./routes/ollamaRouter";
 import openAIRouter from "./routes/openAIRouter";
