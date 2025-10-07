@@ -1,26 +1,14 @@
 const scraper = require("./scraper");
 const embedder = require("./embedding"); 
 const chunker = require("./Chunker");
-const grader = require("./similarities");
 
 import { AppDataSource } from "../model/datasource";
 import { CreateEmbeddingResponse } from "openai/resources/embeddings";
 import { Chunk } from "../model/entities/chunk";
 import { Episode } from "../model/entities/episode";
 import { Show } from "../model/entities/show";
+import { ScrapingResponse } from "types/scraping";
 
-export interface EmbeddingVector {
-    embedding: number[];
-    chunk_text: string;
-}
-
-export interface ScrapingResponse{
-	title: string, 
-	episodeTitle: string,
-	season: number,
-	episode: number,
-	transcript: string
-}
 
 export async function generateDbRecords(
     embeddings: CreateEmbeddingResponse,

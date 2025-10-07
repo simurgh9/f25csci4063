@@ -9,6 +9,10 @@
 		"forceConsistentCasingInFileNames": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
+		"baseUrl": "src",
+    	"paths": {
+      		"@types/*": ["types/*"]
+    	},
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules"],
