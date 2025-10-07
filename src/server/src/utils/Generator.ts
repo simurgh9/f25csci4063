@@ -3,6 +3,7 @@ const embedder = require("./embedding");
 const chunker = require("./Chunker");
 const grader = require("./similarities");
 
+import { AppDataSource } from "../model/datasource";
 import { CreateEmbeddingResponse } from "openai/resources/embeddings";
 import { Chunk } from "../model/entities/chunk";
 import { Episode } from "../model/entities/episode";
@@ -27,6 +28,7 @@ export async function generateDbRecords(
     info: ScrapingResponse
 ) {
     try {
+        console.log(info);
         let show = await Show.findOneBy({ title: info.title })
         if (!show) {
             show = Show.create({ title: info.title });
@@ -63,20 +65,23 @@ export async function generateDbRecords(
         
     } catch (error) {
         console.error('Error generating database records:', error);
-        throw error; // Re-throw to let caller handle it
+        throw error; 
     }
 }
 
 export async function saveShowToDb(id: number){
-    const { transcript } = await scraper.scrapeTranscript(id);
-    const chunks = chunker.chunkText(transcript, 2000);
+    const showInfo = await scraper.scrapeTranscript(id);
+    const chunks = await chunker.chunkText(showInfo.transcript, 2000);
     const embeddingResponse = await embedder.generateEmbeddings(chunks);
-    const showInfo = scraper.scrapeTranscript(id);
     await generateDbRecords(embeddingResponse, chunks, showInfo);
 }
 
 if (require.main === module) {
   (async () => {
+    if (!AppDataSource.isInitialized) {
+        await AppDataSource.initialize();
+        console.log("✅ DataSource initialized");
+    }
     const [, , type, id] = process.argv;
     if (type === "transcript") {
         await saveShowToDb(Number(id));
