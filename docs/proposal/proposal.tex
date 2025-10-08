@@ -15,13 +15,16 @@
 
 \begin{document} \maketitle
 
-\textbf{Description:} 
+\section{Description:}
 
-A cross-platform mobile app that recommends posts to users based on their progress in a tv series to avoid spoilers and promote a safe fandom experience. It will have a simple UI similar to Tumblr, where users can read and write text-based posts about fandoms they enjoy. We will implement \hyperref[explanation]{Retrieval-Augmented Generation} to flag spoilers and improve the user experience. 
+A cross-platform mobile app that recommends posts to users based on
+their progress in a tv series to avoid spoilers and promote a safe
+fandom experience. It will have a simple UI similar to Tumblr, where
+users can read and write text-based posts about fandoms they enjoy. We
+will implement Retrieval-Augmented Generation (Section \ref{rag:exp})
+to flag spoilers and improve the user experience.
 
-\bigskip
-
-\textbf{Libraries:}
+\section{Libraries}
 \begin{itemize}
   \item Frontend: 
   \href{https://flutter.dev/}{Flutter}, \href{https://dart.dev/}{Dart}
@@ -35,25 +38,19 @@ A cross-platform mobile app that recommends posts to users based on their progre
   \item Containerization: \href{https://www.docker.com/}{Docker}
 \end{itemize}
 
-\bigskip
-
-\textbf{Features:}
-\begin{itemize}
+\section{Features}
+\begin{enumerate}
   \item User accounts and authentication
   \item Text-based UI similar to Tumblr
-
-  \includegraphics[width=0.8\textwidth]{media/tumblr_example.jpg}
-
+  \img<sample-ui>[0.8]{Sample text based UI.}{media/tumblr_example.jpg}
   \item Ability to input your current episode for a given tv show
   \item Recommendation of posts based on current episode in a series - spoiler control, tagging system
   \item Post interactions like liking and commenting
   \item User following system
   \item User customization like profile pictures
-\end{itemize}
+\end{enumerate}
 
-\bigskip
-
-\textbf{Stretch Goals:}
+\section{Stretch Goals}
 \begin{itemize}
   \item Support for multimedia posts (images, videos)
   \item Support for media types beyond tv shows (movies, games)
@@ -62,7 +59,7 @@ A cross-platform mobile app that recommends posts to users based on their progre
 
 \bigskip
 
-\label{explanation} \textbf{Retrieval Augmented Generation}
+\section{Retrieval Augmented Generation}\label{rag:exp}
 
 Retrieval-Augmented Generation is a method of allowing llms to respond to queries using supporting information beyond their training data. 
 
