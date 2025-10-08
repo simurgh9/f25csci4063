@@ -6,8 +6,14 @@
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true
+		"forceConsistentCasingInFileNames": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"baseUrl": "src",
+    	"paths": {
+      		"@types/*": ["types/*"]
+    	},
 	},
 	"include": ["src/**/*.ts"],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules"],
 }
