@@ -26,17 +26,35 @@ to flag spoilers and improve the user experience.
 
 \section{Libraries}
 \begin{itemize}
-  \item Frontend: 
-  \href{https://flutter.dev/}{Flutter}, \href{https://dart.dev/}{Dart}
-  \item Backend:    \href{https://expressjs.com/}{Express}, \href{https://www.typescriptlang.org/}{TypeScript}, 
-  \href{https://nodejs.org/en}{Node}
-  \item LLM: 
-  \href{https://openai.com/}{OpenAI}
-  \item Database: 
-  \href{https://typeorm.io/}{TypeORM}, \href{https://www.postgresql.org/}{PostgreSQL}, hosted by
-  \href{https://neon.com/}{Neon}
-  \item Containerization: \href{https://www.docker.com/}{Docker}
+  \item \textbf{Frontend:} 
+  \href{https://flutter.dev/}{Flutter}, 
+  \href{https://dart.dev/}{Dart}
+
+  \item \textbf{Backend:} 
+  \href{https://expressjs.com/}{Express}, 
+  \href{https://www.typescriptlang.org/}{TypeScript}, 
+  \href{https://nodejs.org/en}{Node.js}
+
+  \item \textbf{LLMs:}
+  \begin{itemize}
+    \item \textbf{Platform:} 
+    \href{https://openai.com/api/}{OpenAI API}
+    \begin{itemize}
+      \item \textbf{Models:} 
+      \href{https://platform.openai.com/docs/models/text-embedding-3-small}{Text Embedding 3 Small}, 
+      \href{https://platform.openai.com/docs/models/gpt-5-nano}{GPT-5 Nano}
+    \end{itemize}
+  \end{itemize}
+
+  \item \textbf{Database:} 
+  \href{https://typeorm.io/}{TypeORM}, 
+  \href{https://www.postgresql.org/}{PostgreSQL}, 
+  hosted by \href{https://neon.tech/}{Neon}
+
+  \item \textbf{Containerization:} 
+  \href{https://www.docker.com/}{Docker}
 \end{itemize}
+
 
 \section{Features}
 \begin{enumerate}
@@ -50,20 +68,20 @@ to flag spoilers and improve the user experience.
   \item User customization like profile pictures
 \end{enumerate}
 
+\section{Retrieval Augmented Generation}\label{rag:exp}
+
+Retrieval-Augmented Generation is a method of allowing llms to respond to queries using supporting information beyond their training data. 
+
+Our implementation will involve retrieving relevant transcript data from a database to inform llm spoiler detection. The data is sourced from online transcript websites which are then chunked and stores as vectors in our PostGreSQL database hosted on neon. Posts are tagged with a show, and when a user's feed is being generated, each show is checked for spoilers. We pass the post in question to a chunking model, then we query the databse for context from transcripts for that show using cosine similarity. Then, the resulting context is used by the LLM to determine if the post is a spoiler for the current user. 
+
+Our database will be modeled, generally, as such. We will have users table, a posts table, and relevant join tables for likes and followers. Our vector database will have a shows table, an episodes table, and a chunks table so that we can store indexed chunks for every episode of every show. There will likely be other tables as well, but this is ultimately the largest functional piece of the database design. 
+
 \section{Stretch Goals}
 \begin{itemize}
   \item Support for multimedia posts (images, videos)
   \item Support for media types beyond tv shows (movies, games)
   \item Enhanced profile customization (themes, advanced layouts)
 \end{itemize}
-
-\bigskip
-
-\section{Retrieval Augmented Generation}\label{rag:exp}
-
-Retrieval-Augmented Generation is a method of allowing llms to respond to queries using supporting information beyond their training data. 
-
-Our implementation will involve retrieving relevant transcript data from a database to inform llm spoiler detection.
 
 % \newpage
 % \bibliographystyle{plain}
