@@ -12,13 +12,16 @@
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
+		"@wesleytodd/openapi": "^1.1.0",
 		"axios": "^1.12.2",
+		"bcryptjs": "^3.0.2",
 		"cheerio": "^1.1.2",
 		"dotenv": "^17.2.2",
 		"express": "^5.1.0",
 		"openai": "^5.20.3",
 		"pg": "^8.16.3",
 		"reflect-metadata": "^0.2.2",
+		"tsoa": "^6.6.0",
 		"typeorm": "^0.3.27"
 	},
 	"devDependencies": {
