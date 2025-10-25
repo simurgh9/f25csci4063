@@ -59,7 +59,7 @@ export async function generateDbRecords(
 
 export async function saveShowToDb(id: number){
     const showInfo = await scraper.scrapeTranscript(id);
-    const chunks = await chunker.chunkText(showInfo.transcript, 2000);
+    const chunks = await chunker.chunkText(showInfo.transcript, 300);
     const embeddingResponse = await embedder.generateEmbeddings(chunks);
     await generateDbRecords(embeddingResponse, chunks, showInfo);
 }

@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { IUserController } from "./IUserController";
 import { User } from "../../model/entities/User";
 import { Show } from "../../model/entities/show";
+import { Episode } from "../../model/entities/episode";
+import { SubscriptionInfo } from "../../model/entities/subscriptionInfo";
 import bcrypt from "bcryptjs"; 
 
 export class UserController implements IUserController {
@@ -86,9 +88,10 @@ export class UserController implements IUserController {
             const showTitles = req.body.showTitles; 
             let shows = [];
 
-            const userId = Number(req.body.userId); //we'll likely need to get this from the auth token instead 
-            const user = await User.findOneBy({
-                id: userId
+            const userId = req.body.userId; //we'll likely need to get this from the auth token instead 
+            const user = await User.findOne({
+                where: { id: userId },
+                relations: ["shows"]
             });
 
             if(!user){
@@ -99,8 +102,9 @@ export class UserController implements IUserController {
             }
 
             for(let title of showTitles){
-                const show = Show.findOneBy({
-                    title: title
+                const show = Show.findOne({
+                    where: { title: title },
+                    relations: ["user"]
                 });
                 shows.push(show); 
             }
@@ -137,5 +141,68 @@ export class UserController implements IUserController {
             })
             return;
         }
+    }
+
+    async addCurrentEpisode(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.body.userId; // we'll need to get this from the auth token 
+            const title = req.body.showTitle; 
+            const { season, episode } = req.body;
+
+            const user = await User.findOne({
+                where: { id: userId },
+                relations: ["shows", "subscriptions"]
+            });
+
+            if(!user){
+                res.status(404).json({ 
+                    message: "User not found"
+                });
+                return; 
+            }
+            
+            const show = await Show.findOne({
+                where: { title: title},
+                relations: ["episodes", "subscriptions"]
+            })
+            
+            if(!show){
+                res.status(404).json({ 
+                    message: "Show not found"
+                });
+                return; 
+            }
+            
+            const episodeEntity = await Episode.findOneBy({
+                season: season, 
+                episode: episode
+            })
+            
+            if(!episodeEntity){
+                res.status(404).json({ 
+                    message: "Episode not found"
+                });
+                return; 
+            }
+
+            const subscriptionInfo = SubscriptionInfo.create({
+                user: user,
+                show: show,
+                currentEpisode: episodeEntity
+            });
+            await subscriptionInfo.save(); 
+
+            res.status(200).json({
+                message: "Subscription Added Successfully"
+            });
+            return; 
+
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal server error", 
+                error: error
+            })
+            return; 
+        }    
     }
 }

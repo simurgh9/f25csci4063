@@ -5,4 +5,5 @@ export interface IUserController {
     get(req: Request, res: Response): Promise<void>;
     delete(req: Request, res: Response): Promise<void>;
     addShowForUser(req: Request, res: Response): Promise<void>; 
+    addCurrentEpisode(req: Request, res: Response): Promise<void>;
 }

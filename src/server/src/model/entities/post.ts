@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity, ManyToMany, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, CreateDateColumn } from "typeorm"
 import { Show } from "./show"
 import { User } from "./User"
 
@@ -7,11 +7,14 @@ export class Post extends BaseEntity {
     @PrimaryGeneratedColumn()
     id!: number
 
-    @ManyToOne(() => Show)
-    show!: Show
-
     @Column()
     content!: string
+    
+    @CreateDateColumn()
+    createdAt!: Date; 
+
+    @ManyToOne(() => Show)
+    show!: Show
 
     @ManyToOne(() => User, (user) => user.posts, { onDelete: "CASCADE"})
     user!: User

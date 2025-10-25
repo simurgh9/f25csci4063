@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import { IPostController } from "./IPostController";
-import { Show } from "model/entities/show";
-import { Post } from "model/entities/post";
-import { User } from "model/entities/User";
+import { In, LessThan } from "typeorm";
+import { Show } from "../../model/entities/show";
+import { User } from "../../model/entities/User"
+import { Post } from "../../model/entities/post"
 
 export class PostController implements IPostController {
     async create(req: Request, res: Response){
         try {
-            const userId = req.body.userId;
+            const userId = req.body.userId; // we will need to get this from the auth token
             const user = await User.findOneBy(userId);
 
             const showTitle = req.body.showTitle; 
@@ -36,6 +37,10 @@ export class PostController implements IPostController {
             }); 
 
             await post.save();
+            res.status(200).json({
+                message: "Post created successfully"
+            });
+
             return; 
 
         } catch (error) {
@@ -50,15 +55,19 @@ export class PostController implements IPostController {
 
     async delete(req: Request, res: Response){
         try {
-            const postId = req.body.Id;
-            const post = await Post.findOneBy({ id: postId})
+            const postId = req.body.postId;
+            const post = await Post.findOneBy({ id: postId })
+
             if(!post){
                 res.status(404).json({ message: "Post Not Pound"});
                 return;
             }
 
-            await post.save();
-            res.status(204).json({ message: "Post Deleted Successfully"});
+            await Post.delete({
+                id: postId
+            });
+
+            res.status(200).json({ message: "Post Deleted Successfully"});
             return;
 
         } catch (error) {
@@ -93,6 +102,50 @@ export class PostController implements IPostController {
                 error: error
             })
             return; 
+        }
+    }
+
+    async getRecommendations(req: Request, res: Response){
+        try {
+            const userId = Number(req.query.userId); // we need to get this from the auth token
+            const user = await User.findOne({
+                where: { id: userId },
+                relations: ["shows", "subscriptions"]
+            });
+
+            if(!user){
+                res.status(404).json({
+                    message: "User not found"
+                });
+                return; 
+            }
+
+            const showIds = user.shows.map(show => show.id);
+            const limit = Number(req.query.limit); 
+            const cursor = new Date(req.query.cursor as string); 
+
+            const posts = await Post.find({
+                where: { 
+                    show: In(showIds),
+                    createdAt: LessThan(cursor) 
+                },
+                take: limit
+            });
+
+            
+
+            console.log("Edhig");
+
+            res.status(200).json({
+                message: "Recommendations",
+
+            });
+            return; 
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal Server Error",
+                error: error
+            })
         }
     }
 }

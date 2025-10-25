@@ -7,6 +7,7 @@ require('dotenv').config({
 import ollamaRouter from "./routes/ollamaRouter";
 import openAIRouter from "./routes/openAIRouter";
 import userRouter from "./routes/UserRouter";
+import postRouter from "./routes/PostRouter";
 
 export const app = express();
 
@@ -17,6 +18,7 @@ app.use(
 );
 app.use(json());
 
-app.use("/ollama", ollamaRouter);
+// app.use("/ollama", ollamaRouter);
 app.use("/openAI", openAIRouter);
 app.use("/user", userRouter); 
+app.use("/post", postRouter);
