@@ -68,7 +68,7 @@ if (require.main === module) {
   (async () => {
     if (!AppDataSource.isInitialized) {
         await AppDataSource.initialize();
-        console.log("✅ DataSource initialized");
+        console.log("DataSource initialized");
     }
     const [, , type, id] = process.argv;
     if (type === "transcript") {

@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import { IPostController } from "./IPostController";
+import { OpenAIController } from "../llm/openaiController";
 import { In, LessThan } from "typeorm";
 import { Show } from "../../model/entities/show";
 import { User } from "../../model/entities/User"
 import { Post } from "../../model/entities/post"
+
+const openAiController = new OpenAIController(); 
 
 export class PostController implements IPostController {
     async create(req: Request, res: Response){
@@ -110,7 +113,7 @@ export class PostController implements IPostController {
             const userId = Number(req.query.userId); // we need to get this from the auth token
             const user = await User.findOne({
                 where: { id: userId },
-                relations: ["shows", "subscriptions"]
+                relations: ["shows", "subscriptions", "subscriptions.show", "subscriptions.currentEpisode"]
             });
 
             if(!user){
@@ -129,16 +132,15 @@ export class PostController implements IPostController {
                     show: In(showIds),
                     createdAt: LessThan(cursor) 
                 },
+                relations: ["show", "show.episodes"],
                 take: limit
             });
 
-            
-
-            console.log("Edhig");
+            const safePosts = await openAiController.checkSpoiler(posts, user); 
 
             res.status(200).json({
                 message: "Recommendations",
-
+                recommendations: safePosts
             });
             return; 
         } catch (error) {
