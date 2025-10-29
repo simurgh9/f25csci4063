@@ -1,23 +1,15 @@
-import express from "express";
-import "reflect-metadata";
-require('dotenv').config({
-    path: './.env'
-})
+import { app } from "./app";
+import { AppDataSource } from "./model/datasource"
 
+const port = process.env.PORT || 3000;
 
-import ollamaRouter from "./routes/ollamaRouter";
-import openAIRouter from "./routes/openAIRouter";
+app.listen(port, async () => {
+    try {
+        await AppDataSource.initialize();
+        console.log(`Example app listening at http://localhost:${port}`)
 
-const app = express();
-const PORT = 3000;
-
-// middleware functions
-app.use(express.json());
-
-// routers
-app.use("/ollama", ollamaRouter);
-app.use("/openAI", openAIRouter); 
-
-app.listen(PORT, "0.0.0.0", () => {
-	console.log(`connected at port ${PORT}`);
-});
+      } catch (error) {
+        console.log("An error occured during initialization: \n", error);
+      }
+  } 
+);

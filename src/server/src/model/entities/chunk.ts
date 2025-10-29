@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, Unique } from "typeorm"
 import { Episode } from "./episode"
-
+        
 @Entity()
 @Unique(["episode", "index"])
 export class Chunk extends BaseEntity{

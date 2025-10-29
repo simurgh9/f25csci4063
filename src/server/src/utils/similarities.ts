@@ -1,35 +1,48 @@
-export interface EmbeddingVector {
-    embedding: number[];
-    chunk_text: string;
-}
+import { Chunk } from "../model/entities/chunk";
+import { EmbeddingVector } from "types/embedding";
 
-export function cosineSimilarity(vecA: number[], vecB: number[]): number {
-    if (vecA.length !== vecB.length) {
-        throw new Error("Vectors must be of the same length");
+export class Similarities {
+    private cosineSimilarity(vecA: number[], vecB: number[]): number {
+        if (vecA.length !== vecB.length) {
+            throw new Error("Vectors must be of the same length");
+        }
+
+        const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+        const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+        const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+
+        if (magnitudeA === 0 || magnitudeB === 0) {
+            throw new Error("Vectors must not be zero vectors");
+        }
+
+        return dotProduct / (magnitudeA * magnitudeB);
     }
 
-    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+    findSimilarity(embeddings: EmbeddingVector[], promptEmbedding: number[]) {
+        const similarities: { similarity: number; chunk: string }[] = [];
 
-    if (magnitudeA === 0 || magnitudeB === 0) {
-        throw new Error("Vectors must not be zero vectors");
+        for (const { embedding, chunk_text } of embeddings) {
+            const similarity = this.cosineSimilarity(Array.from(embedding), promptEmbedding);
+            similarities.push({ similarity, chunk: chunk_text });
+        }
+
+        similarities.sort((a, b) => b.similarity - a.similarity);
+
+        return similarities.slice(0, 5);
     }
 
-    return dotProduct / (magnitudeA * magnitudeB);
-}
+    findSimilarityFromDb(embeddings: Chunk[], promptEmbedding: number[]){
+        const similarities: { similarity: number; chunk: string }[] = [];
 
-export function findSimilarity(embeddings: EmbeddingVector[], promptEmbedding: number[]) {
-    const similarities: { similarity: number; chunk: string }[] = [];
+        for (const { embedding, text } of embeddings) {
+            const similarity = this.cosineSimilarity(Array.from(embedding), promptEmbedding);
+            similarities.push({ similarity, chunk: text });
+        }
 
-    for (const { embedding, chunk_text } of embeddings) {
-        const similarity = cosineSimilarity(embedding, promptEmbedding);
-        similarities.push({ similarity, chunk: chunk_text });
+        similarities.sort((a, b) => b.similarity - a.similarity);
+
+        return similarities.slice(0, 5);
     }
-
-    similarities.sort((a, b) => b.similarity - a.similarity);
-
-    return similarities.slice(0, 5);
 }
 
 // if (require.main === module) {

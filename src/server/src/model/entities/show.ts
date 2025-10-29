@@ -1,14 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, BaseEntity } from "typeorm"
 import { Episode } from "./episode"
+import { User } from "./User"
+import { SubscriptionInfo } from "./subscriptionInfo"
 
 @Entity()
 export class Show extends BaseEntity {
     @PrimaryGeneratedColumn()
-    id!: number
+    id!: number;
 
     @Column()
-    title!: string
+    title!: string;
 
     @OneToMany(() => Episode, (episode) => episode.show, { cascade: true })
-    episodes!: Episode[] 
+    episodes!: Episode[];
+
+    @OneToMany(() => SubscriptionInfo, (sub) => sub.show)
+    subscriptions!: SubscriptionInfo[];
+
+    @ManyToMany(() => User, (user) => user.shows)
+    user!: User[];
+
 }
