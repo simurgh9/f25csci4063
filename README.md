@@ -38,6 +38,7 @@
 - Describe where your database lives and give a simple SQL (if using
   SQL) query to query it. For example,
   ```SQL
+  -- FIXETH MOI!!
   SELECT name, email
   FROM customers
   WHERE city = 'New York';
