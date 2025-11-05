@@ -55,11 +55,11 @@
 
 ## Meeting 6
 
-<!-- - Write bullet notes here. -->
+Occured, needs notes.
 
 ## Meeting 7
 
-<!-- - Write bullet notes here. -->
+Occured, needs notes.
 
 ## Meeting 8
 
