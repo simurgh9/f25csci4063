@@ -84,7 +84,7 @@ export class PostController implements IPostController {
 
     async get(req: Request, res: Response) {
         try {
-            const postId = req.body.id 
+            const postId = Number(req.params.id )
             const post = await Post.findOneBy({
                 id: postId
             })

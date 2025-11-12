@@ -5,7 +5,7 @@ const postController = new PostController();
 
 const postRouter = Router(); 
 
-postRouter.get("/get", postController.get);
+postRouter.get("/:id", postController.get);
 postRouter.post("/create", postController.create);
 postRouter.delete("/delete", postController.delete);
 postRouter.get("/recommendations", postController.getRecommendations);
