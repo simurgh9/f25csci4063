@@ -12,13 +12,28 @@ class MainFeed extends StatefulWidget {
   State<MainFeed> createState() => _MainFeedState();
 }
 
-class _MainFeedState extends State<MainFeed> {
+class _MainFeedState extends State<MainFeed>
+    with AutomaticKeepAliveClientMixin<MainFeed> {
+  @override
+  bool get wantKeepAlive => true; // maintain state when swithcing tabs so posts don't disappear
+
   final PostsService postsService = PostsService();
+
   List<Post> posts = [];
+
+  bool _initialLoaded = false;
 
   @override
   void initState() {
     super.initState();
+
+    _loadInitial();
+  }
+
+  Future<void> _loadInitial() async {
+    if (_initialLoaded) return;
+    _initialLoaded = true;
+
     getRecommendedPosts();
   }
 
@@ -27,40 +42,25 @@ class _MainFeedState extends State<MainFeed> {
       context: context,
     );
     setState(() {
-      posts = fetchedPosts; // might have to append rather than replace
+      posts += fetchedPosts;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //   body: SafeArea(
-    //     child: Padding(
-    //       padding: const EdgeInsets.all(8.0),
-    //       child: SingleChildScrollView(
-    //         child: Column(
-    //           children: [
-    //             Text('this is where the posts go'),
-    //             PostCard(
-    //               post: Post(
-    //                 title: 'title',
-    //                 // author: 'author',
-    //                 content: 'post content',
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // );
+    super.build(context);
 
     return Scaffold(
-      body: ListView.builder(
-        itemCount: posts.length,
-        itemBuilder: (context, index) {
-          return PostCard(post: posts[index]);
-        },
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: posts.length,
+            itemBuilder: (context, index) {
+              return PostCard(post: posts[index]);
+            },
+          ),
+        ),
       ),
     );
   }

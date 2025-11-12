@@ -15,13 +15,6 @@ class PostCard extends StatelessWidget {
             title: Text('${post.show} - ${post.user}'),
             subtitle: Text(post.content),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(
-          //     horizontal: 16.0,
-          //     vertical: 20.0,
-          //   ),
-          //   child: Text(post.content),
-          // ),
         ],
       ),
     );

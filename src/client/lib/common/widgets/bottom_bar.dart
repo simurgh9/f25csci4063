@@ -22,10 +22,13 @@ class _BottomBarState extends State<BottomBar> {
   double bottomNavigationBarWidth = 42;
   double bottomNavigationBarBorderWidth = 5;
 
-  List<Widget> pages = [
-    const MainFeed(),
-    const SearchScreen(),
-    const AccountScreen(),
+  // Persist scroll state across tabs
+  final PageStorageBucket _bucket = PageStorageBucket();
+
+  late final List<Widget> _pages = const [
+    MainFeed(key: PageStorageKey('mainFeed')),
+    SearchScreen(key: PageStorageKey('search')),
+    AccountScreen(key: PageStorageKey('account')),
   ];
 
   @override
@@ -43,7 +46,10 @@ class _BottomBarState extends State<BottomBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[_page],
+      body: PageStorage(
+        bucket: _bucket,
+        child: IndexedStack(index: _page, children: _pages),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _page,
         selectedItemColor: GlobalVariables.selectedNavBarColor,
