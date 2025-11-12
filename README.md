@@ -134,11 +134,13 @@
 
 ## Meeting 6
 
-Occured, needs notes.
+- Backend demo
+- Getting post recommendations based on position in series through curl request
 
 ## Meeting 7
 
-Occured, needs notes.
+- Basic frontend for showing post based on position in series (just post content and show title)
+- Font and styling discussion
 
 ## Meeting 8
 
