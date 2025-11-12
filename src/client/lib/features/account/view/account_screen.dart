@@ -25,7 +25,6 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               const SizedBox(height: 24),
 
-              // 👇 extra inset for the content area
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
