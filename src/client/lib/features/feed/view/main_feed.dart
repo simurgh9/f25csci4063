@@ -2,6 +2,8 @@ import 'package:client/features/feed/models/post.dart';
 import 'package:flutter/material.dart';
 
 import 'package:client/features/feed/services/posts_service.dart';
+
+import 'package:client/constants/global_variables.dart';
 import 'package:client/features/feed/view/post_card.dart';
 
 class MainFeed extends StatefulWidget {
@@ -54,11 +56,18 @@ class _MainFeedState extends State<MainFeed>
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: posts.length,
-            itemBuilder: (context, index) {
-              return PostCard(post: posts[index]);
-            },
+          child: Column(
+            children: [
+              Text('Main Feed', style: GlobalVariables.headingStyle),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: posts.length,
+                  itemBuilder: (context, index) {
+                    return PostCard(post: posts[index]);
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),

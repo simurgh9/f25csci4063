@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:client/constants/global_variables.dart';
+
 import 'package:client/features/feed/models/post.dart';
 
 class PostCard extends StatelessWidget {
@@ -12,8 +14,11 @@ class PostCard extends StatelessWidget {
       child: Column(
         children: <Widget>[
           ListTile(
-            title: Text('${post.show} - ${post.user}'),
-            subtitle: Text(post.content),
+            title: Text(
+              '${post.show} - ${post.user}',
+              style: GlobalVariables.bodyStyle,
+            ),
+            subtitle: Text(post.content, style: GlobalVariables.bodyStyle),
           ),
         ],
       ),
