@@ -18,14 +18,26 @@ class _AccountScreenState extends State<AccountScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, // left-align content
             children: [
               Center(
                 child: Text('Profile', style: GlobalVariables.headingStyle),
               ),
               const SizedBox(height: 24),
-              Text(
-                'This is where you can do some account stuff',
-                style: GlobalVariables.bodyStyle,
+
+              // 👇 extra inset for the content area
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('My Posts', style: GlobalVariables.subHeadingStyle),
+                    Text(
+                      'This is where you can do some account stuff',
+                      style: GlobalVariables.bodyStyle,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

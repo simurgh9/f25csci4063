@@ -15,6 +15,11 @@ class GlobalVariables {
     color: secondaryColor,
   );
 
+  static const TextStyle subHeadingStyle = TextStyle(
+    fontSize: 18,
+    color: Colors.black,
+  );
+
   static const TextStyle bodyStyle = TextStyle(
     fontSize: 16,
     color: Colors.black,

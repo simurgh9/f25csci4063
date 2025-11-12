@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 // screens
-import 'package:client/features/account/screens/account_screen.dart';
+import 'package:client/features/account/view/account_screen.dart';
 import 'package:client/features/feed/view/main_feed.dart';
-import 'package:client/features/search/screens/search_screen.dart';
+import 'package:client/features/search/view/search_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
   switch (routeSettings.name) {
