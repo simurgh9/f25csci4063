@@ -85,9 +85,10 @@ export class PostController implements IPostController {
     async get(req: Request, res: Response) {
         try {
             const postId = Number(req.params.id )
-            const post = await Post.findOneBy({
-                id: postId
-            })
+            const post = await Post.findOne({
+                where: { id: postId },
+                relations: ["user", "show"],
+            });
 
             if(!post){
                 res.status(404).json({ 
@@ -96,7 +97,15 @@ export class PostController implements IPostController {
                 return;
             }
 
-            res.status(200).json({ post: post });
+            const strippedPost = {
+                id: post.id,
+                content: post.content,
+                createdAt: post.createdAt,
+                user: post.user.username,
+                show: post.show.title,
+            };
+
+            res.status(200).json({ post: strippedPost });
             return; 
 
         } catch (error) {
