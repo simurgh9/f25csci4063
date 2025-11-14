@@ -5,10 +5,11 @@ const userController = new UserController();
 
 const userRouter = Router(); 
 
-userRouter.get("/:id", userController.get);
 userRouter.post("/create", userController.create);
-userRouter.delete("/:id", userController.delete);
 userRouter.put("/shows", userController.addShowForUser);    
 userRouter.post("/subscriptionInfo", userController.addCurrentEpisode);
+userRouter.get("/:id", userController.get);
+userRouter.delete("/:id", userController.delete);
+userRouter.get("/posts/:userId", userController.getPostsForUser);
 
 export default userRouter; 

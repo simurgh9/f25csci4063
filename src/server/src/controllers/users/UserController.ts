@@ -205,4 +205,34 @@ export class UserController implements IUserController {
             return; 
         }    
     }
+
+        async getPostsForUser(req: Request, res: Response){
+        try {
+            const userId = Number(req.params.userId);
+            const user = await User.findOne({
+                where: { id: userId }, 
+                relations: ["posts"]
+            })
+
+            if(!user){
+                res.status(500).json({
+                    mesage: "User Not Found",
+                });
+                return; 
+            }
+
+            const posts = user.posts;
+            res.status(200).json({
+                posts: posts
+            })
+            return; 
+            
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal Server Error",
+                error: error
+            });
+            return;
+        }
+    }
 }
