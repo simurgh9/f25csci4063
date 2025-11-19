@@ -201,18 +201,18 @@ export class UserController implements IUserController {
             res.status(500).json({
                 message: "Internal server error", 
                 error: error
-            })
+            });
             return; 
         }    
     }
 
-        async getPostsForUser(req: Request, res: Response){
+    async getPostsForUser(req: Request, res: Response){
         try {
             const userId = Number(req.params.userId);
             const user = await User.findOne({
                 where: { id: userId }, 
-                relations: ["posts"]
-            })
+                relations: ["posts", "posts.user", "posts.show"]
+            });
 
             if(!user){
                 res.status(500).json({
@@ -221,12 +221,17 @@ export class UserController implements IUserController {
                 return; 
             }
 
-            const posts = user.posts;
-            res.status(200).json({
-                posts: posts
-            })
-            return; 
-            
+            const strippedPosts = user.posts.map(post => ({
+                id: post.id,
+                content: post.content,
+                createdAt: post.createdAt,
+                user: post.user.username,
+                show: post.show.title
+            }));
+
+
+            res.status(200).json({ posts: strippedPosts });
+            return;            
         } catch (error) {
             res.status(500).json({
                 message: "Internal Server Error",

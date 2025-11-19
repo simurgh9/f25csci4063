@@ -60,6 +60,47 @@ class PostsService {
     }
   }
 
+  Future<List<Post>> getUserPosts({required BuildContext context}) async {
+    try {
+      bool postsFound = false;
+      Map<String, dynamic>? postsResponse;
+
+      http.Response res = await http.get(
+        Uri.parse('$uri/user/posts/1'), // temporary. for testing purposes
+      );
+
+      if (context.mounted) {
+        httpErrorHandle(
+          response: res,
+          context: context,
+          onSuccess: () {
+            postsFound = true;
+            postsResponse = jsonDecode(res.body) as Map<String, dynamic>;
+          },
+        );
+      }
+
+      if (!postsFound) {
+        debugPrint('user posts not found');
+        return [];
+      }
+
+      final List<dynamic> postsList = postsResponse?['posts'] as List<dynamic>;
+
+      final posts = postsList
+          .map((postMap) => Post.fromMap(postMap as Map<String, dynamic>))
+          .toList();
+
+      return posts;
+    } catch (error) {
+      if (context.mounted) {
+        showSnackBar(context, error.toString());
+      }
+
+      return [];
+    }
+  }
+
   Future<Post> getPost({
     required String postId,
     required BuildContext context,
