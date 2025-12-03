@@ -29,6 +29,8 @@ class _MainFeedState extends State<MainFeed>
   bool _isInitialLoading = true;
   bool _isLoading = false;
   bool _hasMore = true;
+  String? _cursor;
+  int _startupLoadCount = 0;
 
   @override
   void initState() {
@@ -46,10 +48,17 @@ class _MainFeedState extends State<MainFeed>
 
   void _onScroll() {
     if (!_hasMore || _isLoading) return;
+    if (!_scrollController.hasClients) return;
 
-    // load more posts when near the bottom
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
+    final position = _scrollController.position;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (maxScroll <= 0) return;
+
+    final progress = position.pixels / maxScroll;
+    final bool isAtBottom = position.atEdge && position.pixels != 0.0;
+
+    if (progress >= 0.6 || isAtBottom) {
       _loadMore();
     }
   }
@@ -60,32 +69,62 @@ class _MainFeedState extends State<MainFeed>
 
     await getRecommendedPosts();
 
+    if (!mounted) return;
     setState(() {
       _isInitialLoading = false;
     });
+
+    _topOffScroll();
   }
 
   Future<void> _loadMore() async {
+    if (_isLoading || !_hasMore || !mounted) return;
+
     setState(() {
       _isLoading = true;
     });
 
     await getRecommendedPosts();
 
+    if (!mounted) return;
     setState(() {
       _isLoading = false;
     });
   }
 
   Future<void> getRecommendedPosts() async {
-    List<Post> fetchedPosts = await postsService.getRecommendedPosts(
+    if (!_hasMore) return;
+
+    final result = await postsService.getRecommendedPosts(
       context: context,
+      cursor: _cursor,
     );
+
+    if (result == null) {
+      return;
+    }
+
+    if (!mounted) return;
     setState(() {
-      if (fetchedPosts.isEmpty) {
+      if (result.posts.isEmpty || result.nextCursor == null) {
         _hasMore = false;
-      } else {
-        posts += fetchedPosts;
+        debugPrint("No more posts to load.");
+      }
+
+      posts += result.posts;
+      _cursor = result.nextCursor;
+    });
+  }
+
+  void _topOffScroll() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+
+      final maxScroll = _scrollController.position.maxScrollExtent;
+
+      if (maxScroll == 0 && _hasMore && !_isLoading && _startupLoadCount < 3) {
+        _startupLoadCount++;
+        _loadMore();
       }
     });
   }
