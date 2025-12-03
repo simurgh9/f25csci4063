@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "547628885478",
+    "project_id": "capstone-login-c29fb",
+    "storage_bucket": "capstone-login-c29fb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547628885478:android:b13f6241d990405498e227",
+        "android_client_info": {
+          "package_name": "com.example.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdh4Rx8EaA0AI5ybpo6UU98hTwPLGDMzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

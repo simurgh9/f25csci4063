@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+
 import 'package:client/features/feed/services/posts_service.dart';
 import 'package:client/features/feed/models/post.dart';
 
@@ -66,6 +68,13 @@ class _AccountScreenState extends State<AccountScreen>
                     return PostCard(post: posts[index]);
                   },
                 ),
+              ),
+              ElevatedButton(
+                // temporary placement
+                onPressed: () {
+                  auth.FirebaseAuth.instance.signOut();
+                },
+                child: const Text("Logout"),
               ),
             ],
           ),
