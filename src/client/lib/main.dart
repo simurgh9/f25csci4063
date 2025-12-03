@@ -67,9 +67,6 @@ class _MyAppState extends State<MyApp> {
           }
         },
       ),
-      // home: const BottomBar(
-      //   initialPage: 0,
-      // ), // temporarily directing immediately to main feed. with need to add auth
     );
   }
 }

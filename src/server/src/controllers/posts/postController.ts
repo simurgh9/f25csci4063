@@ -133,8 +133,16 @@ export class PostController implements IPostController {
             }
 
             const showIds = user.shows.map(show => show.id);
-            const limit = Number(req.query.limit); 
-            const cursor = new Date(req.query.cursor as string); 
+            const limit = Number(req.query.limit) || 5; 
+            
+            let cursor: Date;
+
+            if (req.query.cursor) {
+                cursor = new Date(req.query.cursor as string);
+            } else {
+                cursor = new Date();
+                cursor.setHours(cursor.getHours() + 6); // set date in future b/c it's not picking up latest posts
+            }
 
             const posts = await Post.find({
                 where: { 
@@ -142,14 +150,22 @@ export class PostController implements IPostController {
                     createdAt: LessThan(cursor) 
                 },
                 relations: ["show", "show.episodes"],
+                order: { createdAt: "DESC" },
                 take: limit
             });
 
             const safePosts = await openAiController.checkSpoiler(posts, user); 
 
+            let nextCursor: string | null = null;
+            if(posts.length === limit){
+                const lastPost = posts[posts.length - 1];
+                nextCursor = lastPost.createdAt.toISOString();
+            }
+
             res.status(200).json({
                 message: "Recommendations",
-                recommendations: safePosts
+                recommendations: safePosts,
+                nextCursor
             });
             return; 
         } catch (error) {

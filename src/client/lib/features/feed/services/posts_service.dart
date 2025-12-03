@@ -7,6 +7,7 @@ import 'package:client/common/error_handling.dart';
 import 'package:client/common/utils.dart';
 
 import 'package:client/features/feed/models/post.dart';
+import 'package:client/features/feed/services/recs_result.dart';
 
 import 'package:client/providers/profile_provider.dart';
 
@@ -14,18 +15,23 @@ import 'package:client/common/widgets/bottom_bar.dart';
 import 'package:provider/provider.dart';
 
 class PostsService {
-  Future<List<Post>> getRecommendedPosts({
+  Future<RecommendationsResult?> getRecommendedPosts({
     required BuildContext context,
+    String? cursor,
   }) async {
     try {
       bool recsFound = false;
       Map<String, dynamic>? recsResponse;
 
-      http.Response res = await http.get(
-        Uri.parse(
-          '$uri/post/recommendations?limit=5&cursor=2025-10-30T20:00:00Z&userId=1',
-        ),
-      ); // temporary. for testing purposes
+      final parsedUri = Uri.parse('$uri/post/recommendations').replace(
+        queryParameters: <String, String>{
+          'limit': '10',
+          'userId': '1', // temporary. for testing purposes
+          if (cursor != null) 'cursor': cursor,
+        },
+      );
+
+      http.Response res = await http.get(parsedUri);
 
       if (context.mounted) {
         httpErrorHandle(
@@ -40,28 +46,30 @@ class PostsService {
 
       if (!recsFound) {
         debugPrint('recs not found');
-        return [];
+        return null;
       }
 
       final List<dynamic> recs =
-          recsResponse?['recommendations'] as List<dynamic>;
+          (recsResponse?['recommendations'] as List<dynamic>? ?? []);
 
       final ids = recs
           .map((rec) => rec is Map<String, dynamic> ? rec['id'] : rec)
           .map((id) => id.toString())
           .toList();
 
-      final posts = Future.wait(
+      final posts = await Future.wait(
         ids.map((id) => getPost(postId: id, context: context)),
       );
 
-      return posts;
+      final String? nextCursor = recsResponse?['nextCursor'] as String?;
+
+      return RecommendationsResult(posts: posts, nextCursor: nextCursor);
     } catch (error) {
       if (context.mounted) {
         showSnackBar(context, error.toString());
       }
 
-      return [];
+      return null;
     }
   }
 
