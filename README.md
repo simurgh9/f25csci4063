@@ -78,7 +78,12 @@
 
 ## Meeting 10
 
-<!-- - Write bullet notes here. -->
+- Frontend shown with better feed
+
+### Tasks before Monday
+- Fix slow loading issue
+- Dynamically add shows from frontend
+- Display all posts (even the ones with spoilers - just mark them)
 
 ## Final Report
 
