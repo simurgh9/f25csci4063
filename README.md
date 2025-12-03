@@ -69,11 +69,12 @@
 
 ## Meeting 8
 
-<!-- - Write bullet notes here. -->
+- Updated so user state is maintained between pages
 
 ## Meeting 9
 
-<!-- - Write bullet notes here. -->
+- Updated to display all posts from a specific user
+- Added ability to create post
 
 ## Meeting 10
 
