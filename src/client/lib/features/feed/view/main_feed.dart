@@ -17,26 +17,64 @@ class MainFeed extends StatefulWidget {
 class _MainFeedState extends State<MainFeed>
     with AutomaticKeepAliveClientMixin<MainFeed> {
   @override
-  bool get wantKeepAlive => true; // maintain state when swithcing tabs so posts don't disappear
+  bool get wantKeepAlive => true; // maintain state when switching tabs so posts don't disappear
 
   final PostsService postsService = PostsService();
+
+  final ScrollController _scrollController = ScrollController();
 
   List<Post> posts = [];
 
   bool _initialLoaded = false;
+  bool _isInitialLoading = true;
+  bool _isLoading = false;
+  bool _hasMore = true;
 
   @override
   void initState() {
     super.initState();
-
+    _scrollController.addListener(_onScroll);
     _loadInitial();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_hasMore || _isLoading) return;
+
+    // load more posts when near the bottom
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadMore();
+    }
   }
 
   Future<void> _loadInitial() async {
     if (_initialLoaded) return;
     _initialLoaded = true;
 
-    getRecommendedPosts();
+    await getRecommendedPosts();
+
+    setState(() {
+      _isInitialLoading = false;
+    });
+  }
+
+  Future<void> _loadMore() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await getRecommendedPosts();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> getRecommendedPosts() async {
@@ -44,7 +82,11 @@ class _MainFeedState extends State<MainFeed>
       context: context,
     );
     setState(() {
-      posts += fetchedPosts;
+      if (fetchedPosts.isEmpty) {
+        _hasMore = false;
+      } else {
+        posts += fetchedPosts;
+      }
     });
   }
 
@@ -60,12 +102,23 @@ class _MainFeedState extends State<MainFeed>
             children: [
               Text('Main Feed', style: GlobalVariables.headingStyle),
               Expanded(
-                child: ListView.builder(
-                  itemCount: posts.length,
-                  itemBuilder: (context, index) {
-                    return PostCard(post: posts[index]);
-                  },
-                ),
+                child: _isInitialLoading && posts.isEmpty
+                    // initial progress wheel
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                        controller: _scrollController,
+                        itemCount: posts.length + (_isLoading ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (_isLoading && index == posts.length) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          }
+
+                          return PostCard(post: posts[index]);
+                        },
+                      ),
               ),
             ],
           ),
