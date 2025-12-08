@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai"; 
 import { Request, Response } from "express";
 import { User } from "../../model/entities/User";
 import { Post } from "../../model/entities/post";
@@ -9,7 +9,7 @@ import { Similarities } from "../../utils/similarities";
 import { In } from "typeorm";
 import { CacheService } from "../../services/cacheService";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }); 
 const embedder = new Embedder();
 const similarities = new Similarities();
 
@@ -17,18 +17,18 @@ const embeddingCache = new CacheService<any>();
 const similarityCache = new CacheService<any>();
 const showProgressCache = new CacheService<any>();
 
-export class OpenAIController {
+export class GeminiController { 
 
     async generate(req: Request, res: Response) {
         try {
             const { prompt } = req.body;
 
-            const response = await client.responses.create({
-                model: "gpt-5-nano",
-                input: prompt
+            const response = await client.models.generateContent({
+                model: "gemini-2.5-flash", 
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
             });
 
-            res.json({ output: response.output_text });
+            res.json({ output: response.text });
         } catch (error) {
             console.error("Error generating response:", error);
             res.status(500).json({ error: "Failed to generate response." });
@@ -50,12 +50,12 @@ export class OpenAIController {
 
     private async classifySpoiler(prompt: string): Promise<string> {
         try {
-            const response = await client.responses.create({
-                model: "gpt-5-nano",
-                input: prompt
+            const response = await client.models.generateContent({
+                model: "gemini-2.5-flash", 
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
             });
-
-            return response.output_text ?? "";
+            
+            return (response.text ?? "").trim();
         } catch (error) {
             console.error("Error classifying spoiler:", error);
             return "";
@@ -104,7 +104,7 @@ export class OpenAIController {
         }
 
         const prompt = `
-You are a spoiler classifier.
+You are a spoiler classifier. Respond only with the number '0' or '1'.
 
 Post content:
 ${post.content}

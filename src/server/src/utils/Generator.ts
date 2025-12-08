@@ -1,6 +1,8 @@
 const scraper = require("./scraper");
-const embedder = require("./embedding"); 
-const chunker = require("./Chunker");
+const { Embedder } = require("./embedding"); 
+const { Chunker } = require("./Chunker");
+const chunker = new Chunker();
+const embedder = new Embedder();
 
 import { AppDataSource } from "../model/datasource";
 import { CreateEmbeddingResponse } from "openai/resources/embeddings";
