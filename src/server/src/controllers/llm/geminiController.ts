@@ -35,18 +35,22 @@ export class GeminiController {
         }
     }
 
-    async checkSpoiler(posts: Post[], user: User): Promise<Post[]> {
+    async checkSpoiler(posts: Post[], user: User): Promise<{ post: Post, spoiler: number }[]> {
         try {
             const results = await Promise.all(
                 posts.map(post => this.processPost(post, user))
             );
 
-            return posts.filter((_, idx) => results[idx]?.trim() === "0");
+            return posts.map((post, i) => ({
+                post,
+                spoiler: results[i]?.trim() === "1" ? 1 : 0
+            }));
         } catch (error) {
             console.error("Error in checkSpoiler:", error);
             return [];
         }
     }
+
 
     private async classifySpoiler(prompt: string): Promise<string> {
         try {
@@ -65,7 +69,7 @@ export class GeminiController {
     private async processPost(post: Post, user: User): Promise<string> {
         const contentKey = `embedding:${post.id}`;
         const similarityKey = `similar:${post.id}`;
-        const progressKey = `userProgress:${user.id}`;
+        const progressKey = `userProgress:${user.fireBaseId}`;
 
         let embedded = embeddingCache.get(contentKey);
 
