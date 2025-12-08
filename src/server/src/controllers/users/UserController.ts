@@ -16,7 +16,11 @@ export class UserController implements IUserController {
                 fireBaseId: fireBaseId
             })
 
-            await user.save(); 
+            const response = await user.save(); 
+            res.status(200).json({
+                message: "Action complete",
+                response: response
+            })
             return; 
 
         } catch (error) {
