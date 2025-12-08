@@ -1,12 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity, ManyToMany, JoinTable } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity, ManyToMany, JoinTable, PrimaryColumn } from "typeorm"
 import { Post } from "./post";
 import { Show } from "./show";
 import { SubscriptionInfo } from "./subscriptionInfo";
 
 @Entity()
 export class User extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id!: number
+    @PrimaryColumn()
+    fireBaseId!: string;
 
     @Column({ unique: true})
     username!: string

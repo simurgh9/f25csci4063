@@ -119,9 +119,9 @@ export class PostController implements IPostController {
 
     async getRecommendations(req: Request, res: Response){
         try {
-            const userId = Number(req.query.userId); // we need to get this from the auth token
+            const fireBaseId = req.query.userId as string;//FIX
             const user = await User.findOne({
-                where: { id: userId },
+                where: { fireBaseId: fireBaseId },
                 relations: ["shows", "subscriptions", "subscriptions.show", "subscriptions.currentEpisode"]
             });
 

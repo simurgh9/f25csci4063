@@ -9,12 +9,10 @@ import bcrypt from "bcryptjs";
 export class UserController implements IUserController {
     async create(req: Request, res: Response){
         try {
-            const { username, password } = req.body; 
-            const hashedPassword = await bcrypt.hash(password, 10);
+            const { username } = req.body; 
 
             const user = User.create({
                 username: username,
-                password: hashedPassword
             })
 
             await user.save(); 
@@ -30,9 +28,9 @@ export class UserController implements IUserController {
 
     async delete(req: Request, res: Response){
         try {
-            const userId = Number(req.params.id);
+            const fireBaseId = req.params.id; //FIX 
             const user = await User.findOneBy({
-                id: userId
+                fireBaseId: fireBaseId
             });
 
             if(!user){
@@ -58,9 +56,9 @@ export class UserController implements IUserController {
 
     async get(req: Request, res: Response){
         try {
-            const userId = Number(req.params.id);
+            const fireBaseId = req.params.id;//FIX
             const user = await User.findOneBy({
-                id: userId
+                fireBaseId: fireBaseId
             });
 
             if(!user){
@@ -88,9 +86,9 @@ export class UserController implements IUserController {
             const showTitles = req.body.showTitles; 
             let shows = [];
 
-            const userId = req.body.userId; //we'll likely need to get this from the auth token instead 
+            const fireBaseId = req.body.userId;//FIX
             const user = await User.findOne({
-                where: { id: userId },
+                where: { fireBaseId: fireBaseId },
                 relations: ["shows"]
             });
 
@@ -145,12 +143,12 @@ export class UserController implements IUserController {
 
     async addCurrentEpisode(req: Request, res: Response): Promise<void> {
         try {
-            const userId = req.body.userId; // we'll need to get this from the auth token 
+            const fireBaseId = req.body.userId; //FIX
             const title = req.body.showTitle; 
             const { season, episode } = req.body;
 
             const user = await User.findOne({
-                where: { id: userId },
+                where: { fireBaseId: fireBaseId },
                 relations: ["shows", "subscriptions"]
             });
 
@@ -208,9 +206,9 @@ export class UserController implements IUserController {
 
     async getPostsForUser(req: Request, res: Response){
         try {
-            const userId = Number(req.params.userId);
+            const fireBaseId = req.params.userId;//FIX
             const user = await User.findOne({
-                where: { id: userId }, 
+                where: { fireBaseId: fireBaseId }, 
                 relations: ["posts", "posts.user", "posts.show"]
             });
 
