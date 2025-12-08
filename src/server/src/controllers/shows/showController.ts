@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Show } from "../../model/entities/show";
-import { Episode } from "model/entities/episode";
+import { Episode } from "../../model/entities/episode";
 
 export class ShowController {
     async get(req: Request, res: Response){
@@ -21,10 +21,10 @@ export class ShowController {
 
     async getEpisodesByShow(req: Request, res: Response){
         try {
-            const showId = Number(req.query.showId); 
+            const title = req.query.title as string; 
             const show = await Show.findOne({
                 where: {
-                    id: showId
+                    title: title
                 },
                 relations: ["episodes"]
             });

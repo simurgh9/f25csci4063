@@ -7,8 +7,8 @@ const userRouter = Router();
 
 userRouter.post("/create", userController.create);
 userRouter.put("/shows", userController.addShowForUser);    
-userRouter.post("/subscriptionInfo", userController.getSubscriptionInfoForUser);
-userRouter.get("/subscriptionInfo", userController.addCurrentEpisode);
+userRouter.get("/subscriptionInfo", userController.getSubscriptionInfoForUser);
+userRouter.post("/subscriptionInfo", userController.addCurrentEpisode);
 userRouter.post("/unsubscribe", userController.unsubscribeFromShow);
 userRouter.get("/:id", userController.get);
 userRouter.delete("/:id", userController.delete);
