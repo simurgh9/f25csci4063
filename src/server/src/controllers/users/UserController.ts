@@ -9,10 +9,11 @@ import bcrypt from "bcryptjs";
 export class UserController implements IUserController {
     async create(req: Request, res: Response){
         try {
-            const { username } = req.body; 
+            const { username, fireBaseId } = req.body; 
 
             const user = User.create({
                 username: username,
+                fireBaseId: fireBaseId
             })
 
             await user.save(); 
