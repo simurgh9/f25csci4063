@@ -11,8 +11,8 @@ const openAiController = new OpenAIController();
 export class PostController implements IPostController {
     async create(req: Request, res: Response){
         try {
-            const userId = req.body.userId; // we will need to get this from the auth token
-            const user = await User.findOneBy(userId);
+            const fireBaseId = req.body.userId;//FIX
+            const user = await User.findOneBy(fireBaseId);
 
             const showTitle = req.body.showTitle; 
             const show = await Show.findOneBy({ title: showTitle });
