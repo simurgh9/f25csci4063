@@ -35,13 +35,16 @@ export class OpenAIController {
         }
     }
 
-    async checkSpoiler(posts: Post[], user: User): Promise<Post[]> {
+    async checkSpoiler(posts: Post[], user: User): Promise<{ post: Post, spoiler: number }[]> {
         try {
             const results = await Promise.all(
                 posts.map(post => this.processPost(post, user))
             );
 
-            return posts.filter((_, idx) => results[idx]?.trim() === "0");
+            return posts.map((post, i) => ({
+                post,
+                spoiler: results[i]?.trim() === "1" ? 1 : 0
+            }));
         } catch (error) {
             console.error("Error in checkSpoiler:", error);
             return [];

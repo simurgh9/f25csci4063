@@ -8,6 +8,7 @@ import openAIRouter from "./routes/openAIRouter";
 import userRouter from "./routes/UserRouter";
 import postRouter from "./routes/PostRouter";
 import scraperRouter from "./routes/scraperRouter";
+import showRouter from "./routes/ShowRouter";
 
 export const app = express();
 
@@ -22,3 +23,4 @@ app.use("/openAI", openAIRouter);
 app.use("/user", userRouter); 
 app.use("/post", postRouter);
 app.use("/scraper", scraperRouter);
+app.use("/show", showRouter);
