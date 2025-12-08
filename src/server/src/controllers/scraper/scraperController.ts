@@ -1,5 +1,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { Request, Response } from "express";
+import { saveAllEpisodesForShow } from "../../utils/Generator";
 
 export async function scrapeOverview(pageExtension: number) {
 	try {
@@ -47,6 +49,36 @@ export async function scrapeTranscript(pageExtension: number) {
 		} else {
 			console.error("Scraping error:", "an unknown error occurred");
 			throw error;
+		}
+	}
+}
+
+export async function scrapeShow(req: Request, res: Response) {
+	try {
+		const { showTitle } = req.body;
+		
+		if (!showTitle) {
+			return res.status(400).json({ error: "showTitle is required in request body" });
+		}
+
+		// Start the scraping process asynchronously
+		res.status(202).json({ 
+			message: `Started scraping episodes for "${showTitle}"`,
+			showTitle 
+		});
+
+		// Run the scraping in the background
+		saveAllEpisodesForShow(showTitle).catch(error => {
+			console.error(`Background scraping failed for "${showTitle}":`, error);
+		});
+
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			console.error("Scraping error:", error.message);
+			res.status(500).json({ error: error.message });
+		} else {
+			console.error("Scraping error:", "an unknown error occurred");
+			res.status(500).json({ error: "An unknown error occurred" });
 		}
 	}
 }

@@ -1,18 +1,20 @@
 import { Request, Response } from "express";
 import { IPostController } from "./IPostController";
 import { OpenAIController } from "../llm/openaiController";
-import { In, LessThan } from "typeorm";
+import { In, LessThan, Not } from "typeorm";
 import { Show } from "../../model/entities/show";
 import { User } from "../../model/entities/User"
 import { Post } from "../../model/entities/post"
+import { GeminiController } from "../llm/geminiController";
 
-const openAiController = new OpenAIController(); 
+// const openAiController = new OpenAIController(); 
+const geminiController = new GeminiController();
 
 export class PostController implements IPostController {
     async create(req: Request, res: Response){
         try {
-            const userId = req.body.userId; // we will need to get this from the auth token
-            const user = await User.findOneBy(userId);
+            const fireBaseId = req.body.userId;//FIX
+            const user = await User.findOneBy({ fireBaseId });
 
             const showTitle = req.body.showTitle; 
             const show = await Show.findOneBy({ title: showTitle });
@@ -119,9 +121,9 @@ export class PostController implements IPostController {
 
     async getRecommendations(req: Request, res: Response){
         try {
-            const userId = Number(req.query.userId); // we need to get this from the auth token
+            const fireBaseId = req.query.userId as string;//FIX
             const user = await User.findOne({
-                where: { id: userId },
+                where: { fireBaseId: fireBaseId },
                 relations: ["shows", "subscriptions", "subscriptions.show", "subscriptions.currentEpisode"]
             });
 
@@ -147,14 +149,15 @@ export class PostController implements IPostController {
             const posts = await Post.find({
                 where: { 
                     show: In(showIds),
-                    createdAt: LessThan(cursor) 
+                    createdAt: LessThan(cursor),
+                    user: { fireBaseId: Not(fireBaseId) }
                 },
                 relations: ["show", "show.episodes"],
                 order: { createdAt: "DESC" },
                 take: limit
             });
 
-            const safePosts = await openAiController.checkSpoiler(posts, user); 
+            const safePosts = await geminiController.checkSpoiler(posts, user); 
 
             let nextCursor: string | null = null;
             if(posts.length === limit){

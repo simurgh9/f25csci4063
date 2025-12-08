@@ -65,7 +65,7 @@ export class OpenAIController {
     private async processPost(post: Post, user: User): Promise<string> {
         const contentKey = `embedding:${post.id}`;
         const similarityKey = `similar:${post.id}`;
-        const progressKey = `userProgress:${user.id}`;
+        const progressKey = `userProgress:${user.fireBaseId}`;
 
         let embedded = embeddingCache.get(contentKey);
 

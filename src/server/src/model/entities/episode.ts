@@ -22,4 +22,7 @@ export class Episode extends BaseEntity {
 
     @Column()
     title!: string
+
+    @Column("text", { nullable: true })
+    transcript?: string
 }
