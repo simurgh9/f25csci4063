@@ -148,66 +148,118 @@ export class UserController implements IUserController {
 
     async addCurrentEpisode(req: Request, res: Response): Promise<void> {
         try {
-            const fireBaseId = req.body.userId; //FIX
-            const title = req.body.showTitle; 
+            const fireBaseId = req.body.userId;
+            const title = req.body.showTitle;
             const { season, episode } = req.body;
 
             const user = await User.findOne({
-                where: { fireBaseId: fireBaseId },
+                where: { fireBaseId },
                 relations: ["shows", "subscriptions"]
             });
 
-            if(!user){
-                res.status(404).json({ 
-                    message: "User not found"
-                });
-                return; 
-            }
-            
-            const show = await Show.findOne({
-                where: { title: title},
-                relations: ["episodes", "subscriptions"]
-            })
-            
-            if(!show){
-                res.status(404).json({ 
-                    message: "Show not found"
-                });
-                return; 
-            }
-            
-            const episodeEntity = await Episode.findOneBy({
-                season: season, 
-                episode: episode
-            })
-            
-            if(!episodeEntity){
-                res.status(404).json({ 
-                    message: "Episode not found"
-                });
-                return; 
+            if (!user) {
+                res.status(404).json({ message: "User not found" });
+                return;
             }
 
-            const subscriptionInfo = SubscriptionInfo.create({
-                user: user,
-                show: show,
-                currentEpisode: episodeEntity
+            const show = await Show.findOne({
+                where: { title },
+                relations: ["episodes", "subscriptions"]
             });
-            await subscriptionInfo.save(); 
+
+            if (!show) {
+                res.status(404).json({ message: "Show not found" });
+                return;
+            }
+
+            const episodeEntity = await Episode.findOneBy({
+                season,
+                episode
+            });
+
+            if (!episodeEntity) {
+                res.status(404).json({ message: "Episode not found" });
+                return;
+            }
+
+            // 1. Check for an existing subscription
+            let subscriptionInfo = await SubscriptionInfo.findOne({
+                where: {
+                    user: { fireBaseId },
+                    show: { id: show.id }
+                },
+                relations: ["user", "show"]
+            });
+
+            // 2. If it exists, update it
+            if (subscriptionInfo) {
+                subscriptionInfo.currentEpisode = episodeEntity;
+            } 
+            // 3. If not, create a new one
+            else {
+                subscriptionInfo = SubscriptionInfo.create({
+                    user,
+                    show,
+                    currentEpisode: episodeEntity
+                });
+            }
+
+            await subscriptionInfo.save();
 
             res.status(200).json({
-                message: "Subscription Added Successfully"
+                message: "Subscription updated successfully"
             });
-            return; 
+            return;
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                message: "Internal server error",
+                error
+            });
+            return;
+        }
+    }
+
+    async getSubscriptionInfoForUser(req: Request, res: Response){
+        try {
+            const fireBaseId = req.body.userId;
+
+            const user = await User.findOne({
+                where: { fireBaseId },
+                relations: [
+                    "subscriptions",
+                    "subscriptions.show",
+                    "subscriptions.currentEpisode"
+                ]
+            });
+
+            if (!user) {
+                res.status(404).json({
+                    message: "User not found"
+                });
+                return;
+            }
+
+            const subs = user.subscriptions.map(sub => ({
+                showTitle: sub.show.title,
+                season: sub.currentEpisode?.season ?? null,
+                episode: sub.currentEpisode?.episode ?? null
+            }));
+
+            res.status(200).json({
+                subscriptions: subs
+            });
+            return;
 
         } catch (error) {
             res.status(500).json({
-                message: "Internal server error", 
-                error: error
+                message: "Internal Server Error",
+                error
             });
-            return; 
-        }    
+            return;
+        }
     }
+
 
     async getPostsForUser(req: Request, res: Response){
         try {
@@ -243,4 +295,63 @@ export class UserController implements IUserController {
             return;
         }
     }
+
+    async unsubscribeFromShow(req: Request, res: Response): Promise<void> {
+        try {
+            const fireBaseId = req.body.userId;
+            const title = req.body.showTitle;
+
+            const user = await User.findOne({
+                where: { fireBaseId },
+                relations: ["subscriptions"]
+            });
+
+            if (!user) {
+                res.status(404).json({
+                    message: "User not found"
+                });
+                return;
+            }
+
+            const show = await Show.findOne({
+                where: { title }
+            });
+
+            if (!show) {
+                res.status(404).json({
+                    message: "Show not found"
+                });
+                return;
+            }
+
+            const existingSubscription = await SubscriptionInfo.findOne({
+                where: {
+                    user: { fireBaseId: user.fireBaseId },
+                    show: { id: show.id }
+                }
+            });
+
+            if (!existingSubscription) {
+                res.status(404).json({
+                    message: "Subscription does not exist"
+                });
+                return;
+            }
+
+            await existingSubscription.remove();
+
+            res.status(200).json({
+                message: "Unsubscribed successfully"
+            });
+            return;
+
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal Server Error",
+                error
+            });
+            return;
+        }
+    }
+
 }
