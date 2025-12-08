@@ -11,9 +11,6 @@ export class User extends BaseEntity {
     @Column({ unique: true})
     username!: string
 
-    @Column()
-    password!: string
-
     @OneToMany(() => Post, (post) => post.user, { cascade: true})
     posts!: Post[]
 
