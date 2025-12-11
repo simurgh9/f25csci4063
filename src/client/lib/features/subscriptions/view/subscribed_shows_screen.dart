@@ -29,6 +29,9 @@ class _SubscribedShowsScreenState extends State<SubscribedShowsScreen>
   bool _initialLoaded = false;
   bool _showAvailableShows = false;
 
+  final TextEditingController _requestController = TextEditingController();
+  bool _requestingShow = false;
+
   @override
   void initState() {
     super.initState();
@@ -68,6 +71,16 @@ class _SubscribedShowsScreenState extends State<SubscribedShowsScreen>
     });
   }
 
+  requestShow(String showTitle) {
+    subscriptionService.requestShow(context: context, showTitle: showTitle);
+  }
+
+  @override
+  void dispose() {
+    _requestController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -103,7 +116,6 @@ class _SubscribedShowsScreenState extends State<SubscribedShowsScreen>
 
                     const SizedBox(height: 24),
 
-                    // Toggle text
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
@@ -132,6 +144,62 @@ class _SubscribedShowsScreenState extends State<SubscribedShowsScreen>
                               arguments: {'title': show.title},
                             );
                           },
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 24),
+
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _requestingShow = !_requestingShow;
+                        });
+                      },
+                      child: Center(child: Text('Request a Show')),
+                    ),
+
+                    if (_requestingShow) ...[
+                      const SizedBox(height: 12),
+
+                      // Text field
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: TextField(
+                          controller: _requestController,
+                          decoration: InputDecoration(
+                            labelText: 'Show Title',
+                            border: OutlineInputBorder(),
+                            hintText: 'Enter the show you want added',
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Submit button
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final text = _requestController.text.trim();
+                            if (text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Please enter a show title"),
+                                ),
+                              );
+                              return;
+                            }
+
+                            requestShow(text);
+
+                            _requestController.clear();
+                            setState(() {
+                              _requestingShow = false;
+                            });
+                          },
+                          child: const Text('Submit Request'),
                         ),
                       ),
                     ],

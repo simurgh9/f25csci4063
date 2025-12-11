@@ -105,8 +105,6 @@ class SubscriptionService {
       bool episodesFound = false;
       Map<String, dynamic>? episodesResponse;
 
-      debugPrint("Fetching episodes for show: $showTitle");
-
       http.Response res = await http.get(
         Uri.parse('$uri/show/episodes?title=$showTitle'),
       );
@@ -203,6 +201,35 @@ class SubscriptionService {
           context: context,
           onSuccess: () {
             showSnackBar(context, 'Successfully unsubscribed from $showTitle');
+          },
+        );
+      }
+    } catch (error) {
+      if (context.mounted) {
+        showSnackBar(context, error.toString());
+      }
+    }
+  }
+
+  void requestShow({
+    required BuildContext context,
+    required String showTitle,
+  }) async {
+    try {
+      http.Response res = await http.post(
+        Uri.parse('$uri/scraper/show'),
+        body: jsonEncode({'showTitle': showTitle}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (context.mounted) {
+        httpErrorHandle(
+          response: res,
+          context: context,
+          onSuccess: () {
+            showSnackBar(context, 'Request for $showTitle sent successfully');
           },
         );
       }

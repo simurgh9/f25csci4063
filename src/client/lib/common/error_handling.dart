@@ -13,12 +13,10 @@ void httpErrorHandle({
     case 200:
       onSuccess();
       break;
-    // add specific error code cases later
-    case 500:
-      // showSnackBar(context, jsonDecode(response.body)['error']);
-      showSnackBar(context, 'hey there is an ERROR');
+    case 202:
+      onSuccess();
       break;
     default:
-      showSnackBar(context, response.body);
+      showSnackBar(context, "Something went wrong");
   }
 }
