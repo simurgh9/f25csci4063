@@ -178,4 +178,36 @@ class SubscriptionService {
       }
     }
   }
+
+  void unsubscribeFromShow({
+    required BuildContext context,
+    required String showTitle,
+  }) async {
+    try {
+      http.Response res = await http.post(
+        Uri.parse('$uri/user/unsubscribe'),
+        body: jsonEncode({
+          'userId': 1, // temporary userId for testing
+          'showTitle': showTitle,
+        }),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (context.mounted) {
+        httpErrorHandle(
+          response: res,
+          context: context,
+          onSuccess: () {
+            showSnackBar(context, 'Successfully unsubscribed from $showTitle');
+          },
+        );
+      }
+    } catch (error) {
+      if (context.mounted) {
+        showSnackBar(context, error.toString());
+      }
+    }
+  }
 }

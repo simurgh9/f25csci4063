@@ -69,6 +69,15 @@ class _ShowDetailsScreenState extends State<ShowDetailsScreen> {
     );
   }
 
+  _unsubscribeFromShow() async {
+    if (showTitle == null) return;
+
+    subscriptionService.unsubscribeFromShow(
+      context: context,
+      showTitle: showTitle!,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,6 +117,17 @@ class _ShowDetailsScreenState extends State<ShowDetailsScreen> {
                       await _subscribeToShow();
                     },
               child: const Text('Subscribe to Show'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: _selectedEpisode == null
+                  ? null
+                  : () async {
+                      await _unsubscribeFromShow();
+                    },
+              child: const Text('Unsubscribe from Show'),
             ),
           ),
         ],
