@@ -7,6 +7,7 @@ import 'package:client/constants/global_variables.dart';
 import 'package:client/common/utils.dart';
 
 import 'package:client/features/subscriptions/models/show.dart';
+import 'package:client/features/subscriptions/models/episode.dart';
 import 'package:client/features/subscriptions/models/subscribed_show.dart';
 
 class SubscriptionService {
@@ -93,6 +94,88 @@ class SubscriptionService {
       }
 
       return [];
+    }
+  }
+
+  Future<List<Episode>> getShowEpisodes({
+    required BuildContext context,
+    required String showTitle,
+  }) async {
+    try {
+      bool episodesFound = false;
+      Map<String, dynamic>? episodesResponse;
+
+      http.Response res = await http.get(
+        Uri.parse('$uri/show/episodes?title=$showTitle'),
+      );
+
+      if (context.mounted) {
+        httpErrorHandle(
+          response: res,
+          context: context,
+          onSuccess: () {
+            episodesFound = true;
+            episodesResponse = jsonDecode(res.body) as Map<String, dynamic>;
+          },
+        );
+      }
+
+      if (!episodesFound) {
+        debugPrint('episodes not found for show: $showTitle');
+        return [];
+      }
+
+      final List<dynamic> episodesList =
+          episodesResponse?['episodes'] as List<dynamic>;
+
+      final episodes = episodesList
+          .map(
+            (episodeMap) => Episode.fromMap(episodeMap as Map<String, dynamic>),
+          )
+          .toList();
+
+      return episodes;
+    } catch (error) {
+      if (context.mounted) {
+        showSnackBar(context, error.toString());
+      }
+
+      return [];
+    }
+  }
+
+  void subscribeToShow({
+    required BuildContext context,
+    required String showTitle,
+    required Episode episode,
+  }) async {
+    try {
+      http.Response res = await http.post(
+        Uri.parse('$uri/user/subscriptionInfo'),
+        body: jsonEncode({
+          'userId': 1, // temporary userId for testing
+          'showTitle': showTitle,
+          'seasons': episode.season,
+          'episode': episode.number,
+        }),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (context.mounted) {
+        httpErrorHandle(
+          response: res,
+          context: context,
+          onSuccess: () {
+            showSnackBar(context, 'Successfully subscribed to $showTitle');
+          },
+        );
+      }
+    } catch (error) {
+      if (context.mounted) {
+        showSnackBar(context, error.toString());
+      }
     }
   }
 }

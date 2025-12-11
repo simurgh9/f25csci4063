@@ -12,14 +12,14 @@ class Episode {
   });
 
   Map<String, dynamic> toMap() {
-    return {'id': id, 'season': season, 'number': number, 'title': title};
+    return {'id': id, 'season': season, 'episode': number, 'title': title};
   }
 
   factory Episode.fromMap(Map<String, dynamic> map) {
     return Episode(
       id: map['id'] ?? 0,
-      season: map['season'] ?? '',
-      number: map['number'] ?? '',
+      season: map['season'] ?? 0,
+      number: map['episode'] ?? 0,
       title: map['title'] ?? '',
     );
   }

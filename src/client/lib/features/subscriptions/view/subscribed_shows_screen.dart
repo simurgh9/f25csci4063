@@ -1,5 +1,6 @@
 import 'package:client/features/subscriptions/models/show.dart';
 import 'package:client/features/subscriptions/view/show_card.dart';
+import 'package:client/features/subscriptions/view/show_details_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:client/constants/global_variables.dart';
@@ -87,7 +88,15 @@ class _SubscribedShowsScreenState extends State<SubscribedShowsScreen>
                       (subscribedShow) => ShowCard(
                         title: subscribedShow.title,
                         onTap: () {
-                          // navigate to show details
+                          Navigator.pushNamed(
+                            context,
+                            ShowDetailsScreen.routeName,
+                            arguments: {
+                              'title': subscribedShow.title,
+                              'season': subscribedShow.seasonNumber,
+                              'episode': subscribedShow.episodeNumber,
+                            },
+                          );
                         },
                       ),
                     ),
@@ -117,7 +126,11 @@ class _SubscribedShowsScreenState extends State<SubscribedShowsScreen>
                         (show) => ShowCard(
                           title: show.title,
                           onTap: () {
-                            // give option to subscribe to show
+                            Navigator.pushNamed(
+                              context,
+                              ShowDetailsScreen.routeName,
+                              arguments: show.title,
+                            );
                           },
                         ),
                       ),
