@@ -119,17 +119,18 @@ class _ShowDetailsScreenState extends State<ShowDetailsScreen> {
               child: const Text('Subscribe to Show'),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: _selectedEpisode == null
-                  ? null
-                  : () async {
-                      await _unsubscribeFromShow();
-                    },
-              child: const Text('Unsubscribe from Show'),
+          if (currentSeason != null && currentEpisodeNumber != null)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: _selectedEpisode == null
+                    ? null
+                    : () async {
+                        await _unsubscribeFromShow();
+                      },
+                child: const Text('Unsubscribe from Show'),
+              ),
             ),
-          ),
         ],
       ),
     );
