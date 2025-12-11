@@ -5,8 +5,8 @@ import 'package:client/constants/global_variables.dart';
 // screens
 import 'package:client/features/account/view/account_screen.dart';
 import 'package:client/features/feed/view/main_feed.dart';
-import 'package:client/features/search/view/search_screen.dart';
 import 'package:client/features/posting/view/new_post_screen.dart';
+import 'package:client/features/subscriptions/view/subscribed_shows_screen.dart';
 
 class BottomBar extends StatefulWidget {
   static const routeName = 'home';
@@ -29,7 +29,7 @@ class _BottomBarState extends State<BottomBar> {
   late final List<Widget> _pages = const [
     MainFeed(key: PageStorageKey('mainFeed')),
     NewPostScreen(key: PageStorageKey('newPost')),
-    SearchScreen(key: PageStorageKey('search')),
+    SubscribedShowsScreen(key: PageStorageKey('subscribedShows')),
     AccountScreen(key: PageStorageKey('account')),
   ];
 
@@ -107,7 +107,7 @@ class _BottomBarState extends State<BottomBar> {
                   ),
                 ),
               ),
-              child: const Icon(Icons.search_outlined),
+              child: const Icon(Icons.tv_outlined),
             ),
             label: '',
           ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:client/features/feed/services/posts_service.dart';
-import 'package:client/features/feed/models/post.dart';
+import 'package:client/features/feed/models/recommended_post.dart';
 
 import 'package:client/constants/global_variables.dart';
 import 'package:client/features/feed/view/post_card.dart';
@@ -23,7 +23,7 @@ class _MainFeedState extends State<MainFeed>
 
   final ScrollController _scrollController = ScrollController();
 
-  List<Post> posts = [];
+  List<RecommendedPost> posts = [];
 
   bool _initialLoaded = false;
   bool _isInitialLoading = true;
@@ -155,7 +155,7 @@ class _MainFeedState extends State<MainFeed>
                             );
                           }
 
-                          return PostCard(post: posts[index]);
+                          return PostCard.fromRec(rec: posts[index]);
                         },
                       ),
               ),

@@ -222,7 +222,7 @@ export class UserController implements IUserController {
 
     async getSubscriptionInfoForUser(req: Request, res: Response){
         try {
-            const fireBaseId = req.body.userId;
+            const fireBaseId = req.params.userId;
 
             const user = await User.findOne({
                 where: { fireBaseId },

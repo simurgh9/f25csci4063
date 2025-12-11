@@ -5,7 +5,7 @@ import 'package:client/features/account/view/login_screen.dart';
 import 'package:client/features/account/view/account_screen.dart';
 import 'package:client/features/feed/view/main_feed.dart';
 import 'package:client/features/posting/view/new_post_screen.dart';
-import 'package:client/features/search/view/search_screen.dart';
+import 'package:client/features/subscriptions/view/subscribed_shows_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
   switch (routeSettings.name) {
@@ -24,10 +24,10 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
         settings: routeSettings,
         builder: (_) => const NewPostScreen(),
       );
-    case SearchScreen.routeName:
+    case SubscribedShowsScreen.routeName:
       return MaterialPageRoute(
         settings: routeSettings,
-        builder: (_) => const SearchScreen(),
+        builder: (_) => const SubscribedShowsScreen(),
       );
     case AccountScreen.routeName:
       return MaterialPageRoute(
