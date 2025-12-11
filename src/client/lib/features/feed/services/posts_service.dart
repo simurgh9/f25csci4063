@@ -8,6 +8,7 @@ import 'package:client/common/utils.dart';
 
 import 'package:client/features/feed/models/post.dart';
 import 'package:client/features/feed/services/recs_result.dart';
+import 'package:client/features/feed/models/recommended_post.dart';
 
 import 'package:client/providers/profile_provider.dart';
 
@@ -52,18 +53,21 @@ class PostsService {
       final List<dynamic> recs =
           (recsResponse?['recommendations'] as List<dynamic>? ?? []);
 
-      final ids = recs
-          .map((rec) => rec is Map<String, dynamic> ? rec['id'] : rec)
-          .map((id) => id.toString())
-          .toList();
-
-      final posts = await Future.wait(
-        ids.map((id) => getPost(postId: id, context: context)),
+      final List<RecommendedPost> recommendedPosts = await Future.wait(
+        recs.map((rec) async {
+          final postData = rec['post'];
+          final spoiler = rec['spoiler'];
+          final post = await getPost(postId: postData['id'], context: context);
+          return RecommendedPost(post: post, spoiler: spoiler);
+        }),
       );
 
       final String? nextCursor = recsResponse?['nextCursor'] as String?;
 
-      return RecommendationsResult(posts: posts, nextCursor: nextCursor);
+      return RecommendationsResult(
+        posts: recommendedPosts,
+        nextCursor: nextCursor,
+      );
     } catch (error) {
       if (context.mounted) {
         showSnackBar(context, error.toString());
@@ -115,7 +119,7 @@ class PostsService {
   }
 
   Future<Post> getPost({
-    required String postId,
+    required int postId,
     required BuildContext context,
   }) async {
     try {
@@ -157,7 +161,7 @@ class PostsService {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode({
-          'userId': 1, // temporary. for testing purposes
+          'userId': 360, // temporary. for testing purposes
           'showTitle': title,
           'content': content,
         }),

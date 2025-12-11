@@ -51,8 +51,7 @@ class _MyAppState extends State<MyApp> {
           elevation: 0,
           iconTheme: IconThemeData(color: Colors.black),
         ),
-        useMaterial3:
-            false, // check up on what this was supposed to be doing. forgot
+        useMaterial3: true,
       ),
       onGenerateRoute: (settings) => generateRoute(settings),
       home: StreamBuilder(
