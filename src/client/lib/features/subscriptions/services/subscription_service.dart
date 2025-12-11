@@ -105,6 +105,8 @@ class SubscriptionService {
       bool episodesFound = false;
       Map<String, dynamic>? episodesResponse;
 
+      debugPrint("Fetching episodes for show: $showTitle");
+
       http.Response res = await http.get(
         Uri.parse('$uri/show/episodes?title=$showTitle'),
       );

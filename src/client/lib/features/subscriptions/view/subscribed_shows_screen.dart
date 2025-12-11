@@ -129,7 +129,7 @@ class _SubscribedShowsScreenState extends State<SubscribedShowsScreen>
                             Navigator.pushNamed(
                               context,
                               ShowDetailsScreen.routeName,
-                              arguments: show.title,
+                              arguments: {'title': show.title},
                             );
                           },
                         ),
