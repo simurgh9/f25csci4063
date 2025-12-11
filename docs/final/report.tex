@@ -13,7 +13,71 @@
 
 \begin{document} \maketitle
 
-This is just an example \cite{arlinghaus1996part}
+\section{Description:}
+
+A cross-platform mobile app that recommends posts to users based on
+their progress in a tv series to avoid spoilers and promote a safe
+fandom experience. It will have a simple UI similar to Tumblr, where
+users can read and write text-based posts about fandoms they enjoy. We
+will implement Retrieval-Augmented Generation (Section \ref{rag:exp})
+to flag spoilers and improve the user experience.
+
+\section{Libraries}
+\begin{itemize}
+  \item \textbf{Frontend:} 
+  \href{https://flutter.dev/}{Flutter}, 
+  \href{https://dart.dev/}{Dart}
+
+  \item \textbf{Backend:} 
+  \href{https://expressjs.com/}{Express}, 
+  \href{https://www.typescriptlang.org/}{TypeScript}, 
+  \href{https://nodejs.org/en}{Node.js}
+
+  \item \textbf{LLMs:}
+  \begin{itemize}
+    \item \textbf{Platform:} 
+    \href{https://aistudio.google.com/welcome?utm_source=PMAX&utm_source=PMAX&utm_medium=display&utm_medium=display&utm_campaign=FY25-global-DR-pmax-1710442&utm_campaign=FY25-global-DR-pmax-1710442&utm_content=pmax&utm_content=pmax&gclsrc=aw.ds&gad_source=1&gad_campaignid=21521909442&gbraid=0AAAAACn9t66rkBnISvBHZ-M32yDxRJcAi&gclid=CjwKCAiA0eTJBhBaEiwA-Pa-hU6q6MCiEvIBiCtnfHiaEYB-JrprsTDn9xuBpXbb0s-yNNGABSJqbBoCZSoQAvD_BwE}{Gemini API}
+  \end{itemize}
+
+  \item \textbf{Database:} 
+  \href{https://typeorm.io/}{TypeORM}, 
+  \href{https://www.postgresql.org/}{PostgreSQL}, 
+  hosted by \href{https://neon.tech/}{Neon}
+
+  \item \textbf{Containerization:} 
+  \href{https://www.docker.com/}{Docker}
+\end{itemize}
+
+\section{Features}
+\begin{enumerate}
+  \item User accounts and authentication
+  \item Text-based UI similar to Tumblr
+  \img<sample-ui>[0.8]{Sample text based UI.}{media/tumblr_example.jpg}
+  \item Ability to input your current episode for a given tv show and subscribe / unsubscribe from shows
+  \item Recommendation of posts based on current episode in a series - spoiler control, tagging system
+\end{enumerate}
+
+\section{Challenges}
+The biggest challenge was definitely the sheer scale of the project. We knew going into it that the idea was rather ambitious, but it didn't really click just how much it would be until we started working. It took a lot of time to get each of the features up and running, especially features related to the llm, so timelines were shifted and features were let go.
+
+We also decided that one of us would do the backend and the other would do the frontend, so there was the issue of communicating what each of us needed from the other and finding the motivation to actually do things as requested. 
+
+\section{Limitations}
+Going into it, we set out to have more user interaction and customization. We were going to have the ability to follow other users, liking and commenting on posts, and potentially profile customization. However, given the length of time it took to complete other tasks, we did not include any of these features. In future, we would like to implement them to make the app more complete. 
+
+There are also some rather inefficient systems in place. A lot of it would not scale outside of testing. There is little support for a large user base. We need to implement more methods of caching and data persistence. 
+
+\section{Conclusion}
+While we did not accomplish everything we set out to do, this project was an incredible learning experience. We gained experience with vector-based databases, integrating spoiler detection with llms, github and pull requests, and communicating from different programming perspectives, among other things. There is much yet to do, but we a proud of the current state of the project.
+
+\section{Retrieval Augmented Generation}\label{rag:exp}
+
+Retrieval-Augmented Generation is a method of allowing llms to respond to queries using supporting information beyond their training data. 
+
+Our implementation involves retrieving relevant transcript data from a database to inform llm spoiler detection. The data is sourced from online transcript websites which are then chunked and stores as vectors in our PostGreSQL database hosted on neon. Posts are tagged with a show, and when a user's feed is being generated, each show is checked for spoilers. We pass the post in question to a chunking model, then we query the databse for context from transcripts for that show using cosine similarity. Then, the resulting context is used by the LLM to determine if the post is a spoiler for the current user. 
+
+Our database is modeled, generally, as such. We have users table, a posts table, and relevant join tables for likes and followers. Our vector database has a shows table, an episodes table, and a chunks table so that we can store indexed chunks for every episode of every show.
+
 
 \newpage
 \bibliographystyle{plain}
