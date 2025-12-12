@@ -56,14 +56,21 @@ class PostsService {
       final List<dynamic> recs =
           (recsResponse?['recommendations'] as List<dynamic>? ?? []);
 
-      final List<RecommendedPost> recommendedPosts = await Future.wait(
-        recs.map((rec) async {
-          final postData = rec['post'];
-          final spoiler = rec['spoiler'];
-          final post = await getPost(postId: postData['id'], context: context);
-          return RecommendedPost(post: post, spoiler: spoiler);
-        }),
-      );
+      final List<RecommendedPost> recommendedPosts = recs.map((rec) {
+        final id = rec['id'];
+        final spoiler = rec['spoiler'];
+
+        return RecommendedPost(
+          post: Post(
+            id: id,
+            content: rec['content'],
+            timestamp: rec['createdAt'],
+            user: rec['username'],
+            show: rec['showTitle'],
+          ),
+          spoiler: spoiler,
+        );
+      }).toList();
 
       final String? nextCursor = recsResponse?['nextCursor'] as String?;
 
