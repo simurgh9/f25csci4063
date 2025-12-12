@@ -24,6 +24,7 @@ class _AccountScreenState extends State<AccountScreen>
   @override
   bool get wantKeepAlive => true; // maintain state when swithcing tabs so posts don't disappear
 
+  final uid = auth.FirebaseAuth.instance.currentUser?.uid;
   final PostsService postsService = PostsService();
 
   List<Post> posts = [];
@@ -61,7 +62,14 @@ class _AccountScreenState extends State<AccountScreen>
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Text('Profile', style: GlobalVariables.headingStyle),
+              Flexible(
+                child: Text(
+                  context.watch<ProfileProvider>().username ?? '',
+                  style: GlobalVariables.headingStyle,
+                  softWrap: true,
+                ),
+              ),
+
               const SizedBox(height: 24),
               Text('My Posts', style: GlobalVariables.subHeadingStyle),
               Expanded(
