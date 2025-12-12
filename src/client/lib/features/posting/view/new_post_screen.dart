@@ -1,5 +1,7 @@
 import 'package:client/constants/global_variables.dart';
 import 'package:client/features/feed/services/posts_service.dart';
+import 'package:client/features/subscriptions/models/subscribed_show.dart';
+import 'package:client/features/subscriptions/services/subscription_service.dart';
 import 'package:flutter/material.dart';
 
 class NewPostScreen extends StatefulWidget {
@@ -17,6 +19,18 @@ class _NewPostScreenState extends State<NewPostScreen> {
   final TextEditingController _showTitleController = TextEditingController();
   final TextEditingController _postContentController = TextEditingController();
 
+  final SubscriptionService subscriptionService = SubscriptionService();
+  List<SubscribedShow> subscribedShows = [];
+  String? _selectedShowTitle;
+  bool _loadingSubs = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _loadInitial();
+  }
+
   @override
   void dispose() {
     _showTitleController.dispose();
@@ -24,14 +38,29 @@ class _NewPostScreenState extends State<NewPostScreen> {
     super.dispose();
   }
 
+  _loadInitial() async {
+    await getUserSubscriptions();
+  }
+
   void createPost() {
     if (_addPostFormKey.currentState!.validate()) {
       postsService.createPost(
         context: context,
-        title: _showTitleController.text,
+        title: _selectedShowTitle!,
         content: _postContentController.text,
       );
     }
+  }
+
+  Future<void> getUserSubscriptions() async {
+    setState(() => _loadingSubs = true);
+
+    List<SubscribedShow> fetchedSubscriptions = await subscriptionService
+        .getSubscribedShows(context: context);
+    setState(() {
+      subscribedShows += fetchedSubscriptions;
+      _loadingSubs = false;
+    });
   }
 
   @override
@@ -51,19 +80,37 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 key: _addPostFormKey,
                 child: Column(
                   children: [
-                    TextFormField(
-                      controller: _showTitleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Show Title',
-                        border: OutlineInputBorder(),
+                    if (_loadingSubs)
+                      const CircularProgressIndicator()
+                    else
+                      DropdownButtonFormField<String>(
+                        initialValue: _selectedShowTitle,
+                        items: subscribedShows
+                            .map(
+                              (s) => DropdownMenuItem<String>(
+                                value:
+                                    s.title, // adjust field name if different
+                                child: Text(
+                                  s.title,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() => _selectedShowTitle = value);
+                        },
+                        decoration: const InputDecoration(
+                          labelText: 'Show Title',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please choose a show';
+                          }
+                          return null;
+                        },
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a title';
-                        }
-                        return null;
-                      },
-                    ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _postContentController,
