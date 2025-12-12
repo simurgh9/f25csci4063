@@ -10,7 +10,11 @@ import 'package:client/features/subscriptions/models/show.dart';
 import 'package:client/features/subscriptions/models/episode.dart';
 import 'package:client/features/subscriptions/models/subscribed_show.dart';
 
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+
 class SubscriptionService {
+  final uid = auth.FirebaseAuth.instance.currentUser?.uid;
+
   Future<List<Show>> getAllShows({required BuildContext context}) async {
     try {
       bool showsFound = false;
@@ -58,8 +62,8 @@ class SubscriptionService {
       Map<String, dynamic>? showsResponse;
 
       http.Response res = await http.get(
-        Uri.parse('$uri/user/subscriptionInfo/1'),
-      ); // temporary userId for testing
+        Uri.parse('$uri/user/subscriptionInfo/${uid!}'),
+      );
 
       if (context.mounted) {
         httpErrorHandle(
@@ -150,12 +154,27 @@ class SubscriptionService {
     required Episode episode,
   }) async {
     try {
-      http.Response res = await http.post(
+      http.Response res = await http.put(
+        Uri.parse('$uri/user/shows'),
+        body: jsonEncode({
+          'userId': uid,
+          'showTitles': [showTitle],
+        }),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (res.statusCode != 200) {
+        throw Exception('Failed to subscribe to show');
+      }
+
+      http.Response res2 = await http.post(
         Uri.parse('$uri/user/subscriptionInfo'),
         body: jsonEncode({
-          'userId': 1, // temporary userId for testing
+          'userId': uid,
           'showTitle': showTitle,
-          'seasons': episode.season,
+          'season': episode.season,
           'episode': episode.number,
         }),
         headers: <String, String>{
@@ -165,7 +184,7 @@ class SubscriptionService {
 
       if (context.mounted) {
         httpErrorHandle(
-          response: res,
+          response: res2,
           context: context,
           onSuccess: () {
             showSnackBar(context, 'Successfully subscribed to $showTitle');
@@ -186,10 +205,7 @@ class SubscriptionService {
     try {
       http.Response res = await http.post(
         Uri.parse('$uri/user/unsubscribe'),
-        body: jsonEncode({
-          'userId': 1, // temporary userId for testing
-          'showTitle': showTitle,
-        }),
+        body: jsonEncode({'userId': uid, 'showTitle': showTitle}),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

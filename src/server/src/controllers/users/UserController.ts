@@ -33,7 +33,7 @@ export class UserController implements IUserController {
 
     async delete(req: Request, res: Response){
         try {
-            const fireBaseId = req.params.id; //FIX 
+            const fireBaseId = req.params.id;
             const user = await User.findOneBy({
                 fireBaseId: fireBaseId
             });
@@ -61,7 +61,7 @@ export class UserController implements IUserController {
 
     async get(req: Request, res: Response){
         try {
-            const fireBaseId = req.params.id;//FIX
+            const fireBaseId = req.params.id;
             const user = await User.findOneBy({
                 fireBaseId: fireBaseId
             });
@@ -91,7 +91,7 @@ export class UserController implements IUserController {
             const showTitles = req.body.showTitles; 
             let shows = [];
 
-            const fireBaseId = req.body.userId;//FIX
+            const fireBaseId = req.body.userId;
             const user = await User.findOne({
                 where: { fireBaseId: fireBaseId },
                 relations: ["shows"]
@@ -263,7 +263,7 @@ export class UserController implements IUserController {
 
     async getPostsForUser(req: Request, res: Response){
         try {
-            const fireBaseId = req.params.userId;//FIX
+            const fireBaseId = req.params.userId;
             const user = await User.findOne({
                 where: { fireBaseId: fireBaseId }, 
                 relations: ["posts", "posts.user", "posts.show"]

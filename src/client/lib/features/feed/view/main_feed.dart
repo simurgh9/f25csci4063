@@ -144,6 +144,15 @@ class _MainFeedState extends State<MainFeed>
                 child: _isInitialLoading && posts.isEmpty
                     // initial progress wheel
                     ? const Center(child: CircularProgressIndicator())
+                    : posts.isEmpty
+                    // empty state after loading
+                    ? const Center(
+                        child: Text(
+                          "Nothing to see here.\nSubscribe to some shows!",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      )
                     : ListView.builder(
                         controller: _scrollController,
                         itemCount: posts.length + (_isLoading ? 1 : 0),

@@ -7,8 +7,21 @@ class ProfileProvider extends ChangeNotifier {
 
   List<Post> userPosts = [];
 
+  String? username;
+
+  void setUsername(String newUsername) {
+    username = newUsername;
+    notifyListeners();
+  }
+
   Future<void> refreshUserPosts(BuildContext context) async {
     userPosts = await postsService.getUserPosts(context: context);
+    notifyListeners();
+  }
+
+  void clear() {
+    username = null;
+    userPosts = [];
     notifyListeners();
   }
 }

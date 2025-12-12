@@ -1,3 +1,5 @@
+import 'package:client/features/account/view/login_screen.dart';
+import 'package:client/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart' as auth;
@@ -7,6 +9,7 @@ import 'package:client/features/feed/models/post.dart';
 
 import 'package:client/constants/global_variables.dart';
 import 'package:client/features/feed/view/post_card.dart';
+import 'package:provider/provider.dart';
 
 class AccountScreen extends StatefulWidget {
   static const String routeName = '/accountScreen';
@@ -71,8 +74,17 @@ class _AccountScreenState extends State<AccountScreen>
               ),
               ElevatedButton(
                 // temporary placement
-                onPressed: () {
-                  auth.FirebaseAuth.instance.signOut();
+                onPressed: () async {
+                  await auth.FirebaseAuth.instance.signOut();
+
+                  if (context.mounted) {
+                    context.read<ProfileProvider>().clear();
+
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
+                    );
+                  }
                 },
                 child: const Text("Logout"),
               ),

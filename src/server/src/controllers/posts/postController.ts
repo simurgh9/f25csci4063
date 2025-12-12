@@ -13,7 +13,7 @@ const geminiController = new GeminiController();
 export class PostController implements IPostController {
     async create(req: Request, res: Response){
         try {
-            const fireBaseId = req.body.userId;//FIX
+            const fireBaseId = req.body.userId;
             const user = await User.findOneBy({ fireBaseId });
 
             const showTitle = req.body.showTitle; 
@@ -121,7 +121,7 @@ export class PostController implements IPostController {
 
     async getRecommendations(req: Request, res: Response){
         try {
-            const fireBaseId = req.query.userId as string;//FIX
+            const fireBaseId = req.query.userId as string;
             const user = await User.findOne({
                 where: { fireBaseId: fireBaseId },
                 relations: ["shows", "subscriptions", "subscriptions.show", "subscriptions.currentEpisode"]

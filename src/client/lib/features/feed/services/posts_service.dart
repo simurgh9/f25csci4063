@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,6 +17,8 @@ import 'package:client/common/widgets/bottom_bar.dart';
 import 'package:provider/provider.dart';
 
 class PostsService {
+  final uid = auth.FirebaseAuth.instance.currentUser?.uid;
+
   Future<RecommendationsResult?> getRecommendedPosts({
     required BuildContext context,
     String? cursor,
@@ -27,7 +30,7 @@ class PostsService {
       final parsedUri = Uri.parse('$uri/post/recommendations').replace(
         queryParameters: <String, String>{
           'limit': '10',
-          'userId': '1', // temporary. for testing purposes
+          'userId': uid!,
           if (cursor != null) 'cursor': cursor,
         },
       );
@@ -82,9 +85,7 @@ class PostsService {
       bool postsFound = false;
       Map<String, dynamic>? postsResponse;
 
-      http.Response res = await http.get(
-        Uri.parse('$uri/user/posts/1'), // temporary. for testing purposes
-      );
+      http.Response res = await http.get(Uri.parse('$uri/user/posts/${uid!}'));
 
       if (context.mounted) {
         httpErrorHandle(
@@ -161,7 +162,7 @@ class PostsService {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode({
-          'userId': 360, // temporary. for testing purposes
+          'userId': uid!,
           'showTitle': title,
           'content': content,
         }),
