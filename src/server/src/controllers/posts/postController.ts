@@ -6,9 +6,13 @@ import { Show } from "../../model/entities/show";
 import { User } from "../../model/entities/User"
 import { Post } from "../../model/entities/post"
 import { GeminiController } from "../llm/geminiController";
+import { PostEmbeddingService } from "../../services/postEmbeddingService";
+import { SpoilerService } from "../../services/spoilerService";
 
-// const openAiController = new OpenAIController(); 
+const openAiController = new OpenAIController(); 
 const geminiController = new GeminiController();
+const postEmbeddingService = new PostEmbeddingService();
+const spoilerService = new SpoilerService();
 
 export class PostController implements IPostController {
     async create(req: Request, res: Response){
@@ -17,7 +21,10 @@ export class PostController implements IPostController {
             const user = await User.findOneBy({ fireBaseId });
 
             const showTitle = req.body.showTitle; 
-            const show = await Show.findOneBy({ title: showTitle });
+            const show = await Show.findOne({ 
+                where: { title: showTitle },
+                relations: ["episodes"]
+            });
             
             const content = req.body.content;
 
@@ -42,6 +49,13 @@ export class PostController implements IPostController {
             }); 
 
             await post.save();
+
+            // Pre-compute and store post-to-chunk similarities
+            // This runs async in background - doesn't block the response
+            postEmbeddingService.computeAndStoreSimilarities(post).catch(err => {
+                console.error("Failed to compute similarities for post:", err);
+            });
+
             res.status(200).json({
                 message: "Post created successfully"
             });
@@ -143,7 +157,7 @@ export class PostController implements IPostController {
                 cursor = new Date(req.query.cursor as string);
             } else {
                 cursor = new Date();
-                cursor.setHours(cursor.getHours() + 6); // set date in future b/c it's not picking up latest posts
+                cursor.setHours(cursor.getHours() + 6);
             }
 
             const posts = await Post.find({
@@ -152,12 +166,22 @@ export class PostController implements IPostController {
                     createdAt: LessThan(cursor),
                     user: { fireBaseId: Not(fireBaseId) }
                 },
-                relations: ["show", "show.episodes"],
+                relations: ["show", "user"],
                 order: { createdAt: "DESC" },
                 take: limit
             });
 
-            const safePosts = await geminiController.checkSpoiler(posts, user); 
+            // OPTIMIZED: Use SpoilerService with pre-computed chunks
+            const safePosts = await spoilerService.checkSpoilersOptimized(posts, user);
+
+            const cleanedPosts = safePosts.map(({ post, spoiler }) => ({
+                id: post.id,
+                content: post.content,
+                createdAt: post.createdAt,
+                username: post.user?.username || "Unknown",
+                showTitle: post.show?.title || "Unknown",
+                spoiler
+            }));
 
             let nextCursor: string | null = null;
             if(posts.length === limit){
@@ -167,10 +191,10 @@ export class PostController implements IPostController {
 
             res.status(200).json({
                 message: "Recommendations",
-                recommendations: safePosts,
+                recommendations: cleanedPosts,
                 nextCursor
             });
-            return; 
+            return;
         } catch (error) {
             res.status(500).json({
                 message: "Internal Server Error",
@@ -178,7 +202,4 @@ export class PostController implements IPostController {
             })
         }
     }
-
-
-
 }

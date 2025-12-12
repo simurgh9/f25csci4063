@@ -2,71 +2,89 @@ import { Chunk } from "../model/entities/chunk";
 import { EmbeddingVector } from "types/embedding";
 
 export class Similarities {
-    private cosineSimilarity(vecA: number[], vecB: number[]): number {
-        if (vecA.length !== vecB.length) {
-            throw new Error("Vectors must be of the same length");
-        }
-
-        const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-        const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-        const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-
-        if (magnitudeA === 0 || magnitudeB === 0) {
-            throw new Error("Vectors must not be zero vectors");
-        }
-
-        return dotProduct / (magnitudeA * magnitudeB);
+    // Normalize a vector (returns Float32Array)
+    private normalize(v: number[] | Float32Array): Float32Array {
+        let sum = 0;
+        for (let i = 0; i < v.length; i++) sum += v[i] * v[i];
+        const mag = Math.sqrt(sum);
+        const out = new Float32Array(v.length);
+        for (let i = 0; i < v.length; i++) out[i] = v[i] / mag;
+        return out;
     }
 
+    // Dot product (fast loop)
+    private dot(a: Float32Array | number[], b: Float32Array | number[]): number {
+        let sum = 0;
+        for (let i = 0; i < a.length; i++) sum += a[i] * b[i];
+        return sum;
+    }
+
+    // Calculate cosine similarity assuming both vectors are normalized
+    private cosineSimilarityNormalized(a: Float32Array | number[], b: Float32Array | number[]): number {
+        return this.dot(a, b);
+    }
+
+    // Embeddings coming from in-memory vectors (not DB blobs)
     findSimilarity(embeddings: EmbeddingVector[], promptEmbedding: number[]) {
-        const similarities: { similarity: number; chunk: string }[] = [];
+        const promptNorm = this.normalize(promptEmbedding);
+
+        const sims: { similarity: number; chunk: string }[] = [];
 
         for (const { embedding, chunk_text } of embeddings) {
-            const similarity = this.cosineSimilarity(Array.from(embedding), promptEmbedding);
-            similarities.push({ similarity, chunk: chunk_text });
+            const embNorm = this.normalize(embedding);
+            const similarity = this.cosineSimilarityNormalized(embNorm, promptNorm);
+            sims.push({ similarity, chunk: chunk_text });
         }
 
-        similarities.sort((a, b) => b.similarity - a.similarity);
-
-        return similarities.slice(0, 5);
+        sims.sort((a, b) => b.similarity - a.similarity);
+        return sims.slice(0, 5);
     }
 
-    findSimilarityFromDb(embeddings: Chunk[], promptEmbedding: number[]){
-        const similarities: { similarity: number; chunk: string }[] = [];
+    // Optimized similarity for DB-stored embeddings using min-heap (no full sort)
+    findSimilarityFromDb(embeddings: Chunk[], promptEmbedding: number[], topK: number = 5) {
+        const promptNorm = this.normalize(promptEmbedding);
+
+        // Use min-heap approach: maintain only top K items
+        const topK_items: { similarity: number; chunk: string }[] = [];
+        let minIndex = 0;
+
+        const updateMinIndex = () => {
+            minIndex = 0;
+            for (let i = 1; i < topK_items.length; i++) {
+                if (topK_items[i].similarity < topK_items[minIndex].similarity) {
+                    minIndex = i;
+                }
+            }
+        };
 
         for (const { embedding, text } of embeddings) {
-            const similarity = this.cosineSimilarity(Array.from(embedding), promptEmbedding);
-            similarities.push({ similarity, chunk: text });
+            // Convert Buffer/number[] to number array and normalize
+            let embArray: number[];
+            if (Array.isArray(embedding)) {
+                embArray = embedding as number[];
+            } else {
+                // It's a Buffer, convert to number array
+                embArray = Array.from(embedding as any) as number[];
+            }
+            const embNorm = this.normalize(embArray);
+
+            // Calculate cosine similarity (dot product of normalized vectors)
+            const similarity = this.cosineSimilarityNormalized(embNorm, promptNorm);
+
+            // Maintain top K using min-heap logic
+            if (topK_items.length < topK) {
+                topK_items.push({ similarity, chunk: text });
+                if (topK_items.length === topK) {
+                    updateMinIndex();
+                }
+            } else if (similarity > topK_items[minIndex].similarity) {
+                topK_items[minIndex] = { similarity, chunk: text };
+                updateMinIndex();
+            }
         }
 
-        similarities.sort((a, b) => b.similarity - a.similarity);
-
-        return similarities.slice(0, 5);
+        // Final sort of only top K items
+        topK_items.sort((a, b) => b.similarity - a.similarity);
+        return topK_items;
     }
 }
-
-// if (require.main === module) {
-//   (async () => {
-//     const [, , type, id] = process.argv;
-//     if (type === "transcript") {
-//         const { transcript } = await scraper.scrapeTranscript(id);
-
-//         const chunks = chunker.chunkText(transcript, 2000);
-
-//         const embeddingResponse = await embedder.generateEmbeddings(chunks);
-
-//         const records: EmbeddingVector[] = embeddingResponse.data.map((item: any, index: number) => ({
-//         embedding: item.embedding,
-//         chunk_text: chunks[index],
-//         }));
-
-//         const promptResponse = await embedder.generateEmbeddings(["The way Gus went out was intense!"]);
-//         const promptEmbedding = promptResponse.data[0].embedding;
-
-//         const similarities = findSimilarity(records, promptEmbedding);
-//         console.log(similarities)
-//     } else {
-//         console.log("Usage: npx ts-node embedding.ts transcript <topicId>");
-//     }
-//   })();
-// }
