@@ -43,3 +43,5 @@ node_modules
 ## Build tool directories for auxiliary files
 # latexrun
 latex.out/
+
+.vscode

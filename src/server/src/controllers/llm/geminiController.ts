@@ -52,7 +52,8 @@ export class GeminiController {
     }
 
 
-    private async classifySpoiler(prompt: string): Promise<string> {
+    // Made public for optimized endpoint
+    async classifySpoilerFromPrompt(prompt: string): Promise<string> {
         try {
             const response = await client.models.generateContent({
                 model: "gemini-2.5-flash", 
@@ -64,6 +65,10 @@ export class GeminiController {
             console.error("Error classifying spoiler:", error);
             return "";
         }
+    }
+
+    private async classifySpoiler(prompt: string): Promise<string> {
+        return this.classifySpoilerFromPrompt(prompt);
     }
 
     private async processPost(post: Post, user: User): Promise<string> {
